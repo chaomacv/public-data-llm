@@ -58,6 +58,8 @@
 
 这是从 [beijing-open-data-enterprise-risk](https://github.com/chaomacv/beijing-open-data-enterprise-risk) 的业务问题出发建立的新后处理工程。原仓库和原始数据不做删除或覆盖。本项目重新实现处理模块，不复制旧脚本中的云 API 凭据或非企业筛选提示词。
 
+[审查机制与人工抽查建议](docs/review_mechanism.md)：逐表约束、逐条数量对账、带退出机制的抽样验收设计和原始证据追溯。人工抽查尚未执行，不作为本批准确率结论。
+
 ## 当前版本能做什么
 
 1. 接收独立下载器的工作目录，或服务器上的原始文件目录；按内容哈希盘点并保存处理状态。

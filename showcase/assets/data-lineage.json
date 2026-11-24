@@ -50,6 +50,7 @@
     }
   ],
   "flow_axis": "processing_stage_order_not_elapsed_time",
+  "flow_scope": "retained_to_semantic_representatives_not_all_final_results",
   "flow_points": [
     {
       "id": "parsed",
@@ -97,42 +98,6 @@
       "details": [
         "精确分组：388,348 个代表 + 3,806 条重复来源。",
         "仅同文件、同表、完整字段和语境一致才复用；逐条核对来源后回填。"
-      ]
-    },
-    {
-      "id": "restored",
-      "name": "来源回填",
-      "count": 392154,
-      "count_key": "semantic",
-      "unit": "条复杂来源记录",
-      "step": 5,
-      "details": [
-        "代表推理完成后，逐来源核对并回填，恢复原始来源粒度。",
-        "388,348 个推理结果服务于 392,154 条来源，不删除重复记录。"
-      ]
-    },
-    {
-      "id": "ledger",
-      "name": "合并台账",
-      "count": 14812812,
-      "count_key": "retained",
-      "unit": "条处理台账记录",
-      "step": 7,
-      "details": [
-        "字段方案 14,420,658 + 回填语义来源 392,154 = 14,812,812。",
-        "提取、无事件和待复核三类都保留独立去向。"
-      ]
-    },
-    {
-      "id": "accounted",
-      "name": "覆盖对账",
-      "count": 43653625,
-      "count_key": "known",
-      "unit": "条已对账的已知记录",
-      "step": 8,
-      "details": [
-        "14,812,812 条处理台账 + 27,792,348 条相关性排除 + 1,048,465 条质量剔除 = 43,653,625 条已知记录全部有去向。",
-        "最终数量回到全批覆盖口径；处理台账与排除台账分别保留。"
       ]
     }
   ],

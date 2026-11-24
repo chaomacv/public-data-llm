@@ -74,7 +74,7 @@ test('all HTML anchors and local assets resolve, and public UI has no remote scr
   assert.equal(ids.length, new Set(ids).size, 'Duplicate HTML id');
   for (const [, target] of html.matchAll(/\b(?:href|src)="([^"]+)"/g)) {
     if (target.startsWith('#')) assert.ok(ids.includes(target.slice(1)), target);
-    else if (!/^https?:/.test(target)) assert.ok(fs.existsSync(path.join(root, 'showcase', target)), target);
+    else if (!/^https?:/.test(target)) assert.ok(fs.existsSync(path.join(root, 'showcase', target.split(/[?#]/)[0])), target);
   }
   for (const [, target] of html.matchAll(/aria-(?:controls|labelledby)="([^"]+)"/g)) {
     for (const id of target.split(/\s+/)) assert.ok(ids.includes(id), id);

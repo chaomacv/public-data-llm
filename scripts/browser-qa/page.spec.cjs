@@ -371,20 +371,18 @@ test('sunburst pointer focus has no rectangular outline and keyboard focus remai
 });
 
 
-test('lineage routing returns to original sources while observed time remains a separate view',async({page},info)=>{
+test('lineage decreases along the semantic branch while historical time remains separate',async({page},info)=>{
  await page.locator('[data-gallery-page="8"]').click();await page.locator('[data-notebook="8"] .notebook-reader-open').click();
  const chart=page.locator('#gallery-timeline-chart');await expect(chart).toHaveAttribute('data-ready','true');
- await expect(chart).toHaveAttribute('data-mode','flow');await expect(page.locator('[data-lineage-point]')).toHaveCount(7);
+ await expect(chart).toHaveAttribute('data-mode','flow');await expect(page.locator('[data-lineage-point]')).toHaveCount(4);
  await page.locator('[data-lineage-point="3"]').focus();
  await expect(chart).toHaveAttribute('data-selected-count','388348');
  await expect(page.locator('#lineage-info')).toContainText('3,806');
  const representative=page.locator('[data-lineage-point="3"]');
  if(page.viewportSize().width>1100){await representative.hover();await expect(page.locator('.lineage-tooltip')).toBeVisible();await expect(page.locator('.lineage-tooltip')).toContainText('388,348');}
- await page.locator('[data-lineage-point="4"]').click();await expect(chart).toHaveAttribute('data-selected-count','392154');
- await expect(page.locator('#lineage-info')).toContainText('回填');
- await page.locator('[data-lineage-point="4"]').focus();await page.locator('[data-lineage-point="4"]').press('ArrowRight');
- await expect(chart).toHaveAttribute('data-selected-count','14812812');
- await page.locator('#lineage-scale').selectOption('linear');await expect(chart).toHaveAttribute('data-selected-count','14812812');
+ await page.locator('[data-lineage-point="2"]').click();await expect(chart).toHaveAttribute('data-selected-count','392154');
+ await page.locator('[data-lineage-point="2"]').press('ArrowRight');await expect(chart).toHaveAttribute('data-selected-count','388348');
+ await page.locator('#lineage-scale').selectOption('linear');await expect(chart).toHaveAttribute('data-selected-count','388348');
  await page.locator('#lineage-scale').selectOption('log');await representative.click();
  await page.screenshot({path:info.outputPath('lineage-stage-flow.png')});
  await page.locator('[data-lineage-mode="time"]').click();await expect(chart).toHaveAttribute('data-mode','time');
@@ -535,9 +533,10 @@ test('processing stages explain files, routing, identity, exports and final acce
  await page.locator('[data-language="en"]').click();await expect(visual).toContainText('Four processing routes');
  await expect(page.locator('#run-detail-input')).toContainText('2,612');await expect(page.locator('#run-detail-label')).toContainText('processing routes');
  await page.locator('[data-run-step="2"]').click();await expect(page.locator('#run-detail-visual')).toContainText('The file card seen by the model');await expect(page.locator('#run-detail-visual')).toContainText('某区企业处罚公示.xlsx');expect(await page.locator('#run-detail-visual dt').evaluateAll(labels=>labels.some(el=>{const range=document.createRange();range.selectNodeContents(el);return new Set([...range.getClientRects()].map(r=>Math.round(r.top))).size>1;}))).toBe(false);await expect(visual).toContainText('From file screening');
- await page.locator('[data-run-step="4"]').click();await expect(visual).toBeVisible();await expect(page.locator('#run-detail-visual')).toBeHidden();
+ await page.locator('[data-run-step="4"]').click();await expect(visual).toBeVisible();await expect(page.locator('#run-detail-visual')).toBeVisible();
  await expect(visual).toContainText('From processing units');
  for(const value of ['2,612','14,812,812','14,420,658','392,154'])await expect(visual).toContainText(value);
+ await expect(page.locator('#run-detail-visual .run-route-example')).toHaveCount(4);
  await expect(visual).toContainText('Includes review records');await expect(visual).toContainText('1,048,465');
  await expect(visual).toContainText('Complex semantic sources');expect(await visual.locator('.run-record-flow').innerText()).not.toMatch(/[\u3400-\u9fff]/);
  expect(await page.locator('#run-step-panel>dl dt').evaluateAll(labels=>labels.every(el=>el.nextElementSibling.getBoundingClientRect().left-el.getBoundingClientRect().right>=4))).toBe(true);
@@ -568,5 +567,33 @@ test('processing stages explain files, routing, identity, exports and final acce
   await expect(visual).toContainText(['多条来源，关联到同一画像','四类结果，分别保存','每条记录，都有去向'][i-6]);
   await page.locator('.run-explorer').screenshot({path:info.outputPath('pipeline-step-0'+(i+1)+'.png')});
   await page.locator('[data-language="en"]').click();
+ }
+});
+
+
+test('review gates expose implemented checks, proposed human sampling and a working calculator',async({page},info)=>{
+ await page.goto('/?lang=zh#review-mechanism');const section=page.locator('#review-mechanism');
+ await expect(section).toHaveAttribute('data-ready','true');
+ await expect(page.locator('#review-panel-0')).toBeVisible();await expect(section).toContainText('金额与单位');
+ await page.locator('[data-review-tab="1"]').click();await expect(page.locator('#review-accounting')).toContainText('43,653,625');
+ await page.locator('[data-review-tab="2"]').click();await expect(page.locator('#review-panel-2')).toBeVisible();
+ await expect(page.locator('#review-detection')).toHaveText('95.2%');await expect(section).toContainText('尚未执行人工抽查');
+ await page.locator('#review-error-rate').selectOption('0.05');await expect(page.locator('#review-detection')).toHaveText('>99.9%');
+ await page.locator('#review-error-rate').selectOption('0.02');
+ await page.locator('#review-sample-n').focus();await page.locator('#review-sample-n').press('End');await expect(page.locator('#review-sample-n-value')).toHaveText('300');
+ await expect(page.locator('#review-detection')).toHaveText('99.8%');
+ await page.locator('[data-review-tab="2"]').focus();await page.locator('[data-review-tab="2"]').press('ArrowRight');await expect(page.locator('#review-panel-3')).toBeVisible();
+ for(const i of [0,1,2,3]){
+  await page.locator(`[data-review-tab="${i}"]`).click();
+  expect(await section.evaluate(el=>el.scrollWidth-el.clientWidth)).toBeLessThanOrEqual(1);
+  await section.screenshot({path:info.outputPath('review-gate-'+i+'.png')});
+ }
+ await page.locator('[data-language="en"]').click();
+ await expect(section).toContainText('Human sampling has not been performed');
+ for(const i of [0,1,2,3]){
+  await page.locator(`[data-review-tab="${i}"]`).click();
+  expect(await page.locator('#review-panel-'+i).innerText()).not.toMatch(/[\u3400-\u9fff]/);
+  expect(await page.evaluate(()=>document.documentElement.scrollWidth)).toBeLessThanOrEqual(page.viewportSize().width+1);
+  if(i===2)await section.screenshot({path:info.outputPath('review-human-english.png')});
  }
 });

@@ -95,9 +95,6 @@ def build(assets):
         ('retained', '保留', 'retained', '条保留记录', 4, [f"相关性排除 {n('excluded')} 条，质量剔除 {n('quality')} 条，保留 {n('retained')} 条。", stages[4]['flow'][0]]),
         ('semantic', '语义来源', 'semantic', '条复杂来源记录', 4, [f"{n('mapped')} 条走字段方案；{n('semantic')} 条进入逐条语义通道。", stages[4]['flow'][1]]),
         ('representatives', '内容代表', 'representatives', '个内容代表', 5, [f"精确分组：{n('representatives')} 个代表 + {n('reused')} 条重复来源。", stages[5]['flow'][1]]),
-        ('restored', '来源回填', 'semantic', '条复杂来源记录', 5, ['代表推理完成后，逐来源核对并回填，恢复原始来源粒度。', f"{n('representatives')} 个推理结果服务于 {n('semantic')} 条来源，不删除重复记录。"]),
-        ('ledger', '合并台账', 'retained', '条处理台账记录', 7, [f"字段方案 {n('mapped')} + 回填语义来源 {n('semantic')} = {n('retained')}。", '提取、无事件和待复核三类都保留独立去向。']),
-        ('accounted', '覆盖对账', 'known', '条已对账的已知记录', 8, [stages[8]['output'], '最终数量回到全批覆盖口径；处理台账与排除台账分别保留。']),
     ]
     result = {'schema_version': 1, 'kind': 'completed_batch_lineage',
               'source_commit': final['source_commit'], 'completed_at': final['completed_at'],
@@ -106,6 +103,7 @@ def build(assets):
                                 for name in ['final-results.json', 'run-summary.json', 'gallery-data.json', 'quality-correction.json']},
               'counts': c, 'outcomes': outcomes, 'equations': equations,
               'flow_axis': 'processing_stage_order_not_elapsed_time',
+              'flow_scope': 'retained_to_semantic_representatives_not_all_final_results',
               'flow_points': [{'id': ident, 'name': name, 'count': c[key], 'count_key': key,
                                'unit': unit, 'step': step, 'details': details}
                               for ident, name, key, unit, step, details in points],
@@ -113,7 +111,7 @@ def build(assets):
               'quality_correction': final['quality_correction'],
               'timing_note': '时间曲线为质量更正前的历史执行观测，分母388,349；更正后业务口径代表388,348，不改写历史观测。阶段图按处理顺序排列，不虚构阶段完成时刻。时间图只使用真实观测；末点为最终验收时已全部完成，并非精确推理结束时刻。'}
     (assets / 'data-lineage.json').write_text(json.dumps(result, ensure_ascii=False, indent=2) + '\n', encoding='utf-8')
-    print('Exported seven lineage points, nine stages and actual progress observations.')
+    print('Exported four monotone lineage points, nine stages and actual progress observations.')
 
 
 if __name__ == '__main__':

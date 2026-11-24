@@ -56,6 +56,8 @@ The project converts heterogeneous files downloaded from Beijing’s public-data
 
 This is a new post-processing implementation motivated by the business questions in [beijing-open-data-enterprise-risk](https://github.com/chaomacv/beijing-open-data-enterprise-risk). It does not delete or overwrite the original repository or input data, or copy cloud credentials and unrelated screening prompts from older scripts.
 
+[Review mechanisms and proposed human sampling](docs/review_mechanism.md): table constraints, record accounting, sampling with a bounded repair path, and source provenance. Human sampling has not been performed and is not evidence of this batch’s accuracy.
+
 ## Capabilities
 
 1. Accept a standalone downloader’s work directory or a server-side input directory. Inventory files by content hash and persist processing progress.
