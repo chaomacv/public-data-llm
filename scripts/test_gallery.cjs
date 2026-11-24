@@ -5,6 +5,16 @@ const {eventGroups, eventView, autoplayStep, loopOrder} = require('../showcase/g
 const data = JSON.parse(fs.readFileSync(require('node:path').join(__dirname, '../showcase/assets/gallery-data.json'), 'utf8'));
 const sum = (rows, key) => rows.reduce((n, r) => n + r[key], 0);
 
+test('dedup bands remain proportional and disjoint when almost all records are unique',()=>{
+ const {dedupLayout}=require('../showcase/gallery.js');
+ for(const representative_records of [1,27,99]){
+  const p=dedupLayout({source_records:100,representative_records});
+  assert.equal(p.uniqueHeight/p.duplicateHeight,representative_records/(100-representative_records));
+  assert.ok(p.duplicateTop>=60+p.uniqueHeight);
+  assert.equal(p.duplicateTop+p.duplicateHeight,300);
+ }
+});
+
 test('gallery aggregates reconcile separately within the completed full corpus', () => {
   assert.equal(data.kind, 'aggregate_notebook_gallery');
   assert.equal(data.final_pipeline_complete, true);
