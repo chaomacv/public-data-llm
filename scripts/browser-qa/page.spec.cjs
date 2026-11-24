@@ -501,7 +501,7 @@ test('language controls preserve notebook interaction, translate new content and
 });
 
 
-test('first four processing steps explain files, cards and the screening-to-plan transition',async({page},info)=>{
+test('processing stages explain files, routing, identity, exports and final acceptance',async({page},info)=>{
  await page.goto('/?lang=zh#pipeline');await expect(page.locator('#run-lineage-table')).toHaveAttribute('data-ready','true');
  const visual=page.locator('#run-step-visual');
  for(let i=0;i<4;i++){
@@ -553,5 +553,20 @@ test('first four processing steps explain files, cards and the screening-to-plan
  await page.locator('[data-language="en"]').click();await expect(visual).toContainText('Complex semantic data in five steps');expect(await visual.innerText()).not.toMatch(/[\u3400-\u9fff]/);
  expect(await page.evaluate(()=>document.documentElement.scrollWidth)).toBeLessThanOrEqual(page.viewportSize().width+1);
  await page.locator('.run-explorer').screenshot({path:info.outputPath('pipeline-step-06-english.png')});
- await page.locator('[data-run-step="6"]').click();await expect(visual).toBeHidden();
+ for(const i of [6,7,8]){
+  await page.locator(`[data-run-step="${i}"]`).click();
+  await expect(visual).toBeVisible();await expect(visual).toHaveAttribute('data-step',String(i));
+  await expect(page.locator('#run-detail-visual')).toBeHidden();
+  if(i===6){for(const n of ['8,800,229','5,202,714'])await expect(visual).toContainText(n);await expect(visual).toContainText('Keep identities separate');}
+  if(i===7){await expect(visual.locator('.run-export-file')).toHaveCount(4);for(const n of ['14,812,812','5,202,714','5,968,620','6,331,400'])await expect(visual).toContainText(n);}
+  if(i===8){await expect(visual.locator('.run-audit-checks [data-passed="true"]')).toHaveCount(3);for(const n of ['27,792,348','1,048,465','14,812,812','43,653,625','6,179,034'])await expect(visual).toContainText(n);await expect(visual).toContainText('Already included in the ledger');}
+  expect(await visual.innerText()).not.toMatch(/[\u3400-\u9fff]/);
+  expect(await visual.evaluate(el=>el.scrollWidth-el.clientWidth)).toBeLessThanOrEqual(1);
+  expect(await page.evaluate(()=>document.documentElement.scrollWidth)).toBeLessThanOrEqual(page.viewportSize().width+1);
+  await page.locator('.run-explorer').screenshot({path:info.outputPath('pipeline-step-0'+(i+1)+'-english.png')});
+  await page.locator('[data-language="zh"]').click();
+  await expect(visual).toContainText(['多条来源，关联到同一画像','四类结果，分别保存','每条记录，都有去向'][i-6]);
+  await page.locator('.run-explorer').screenshot({path:info.outputPath('pipeline-step-0'+(i+1)+'.png')});
+  await page.locator('[data-language="en"]').click();
+ }
 });

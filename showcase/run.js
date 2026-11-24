@@ -30,7 +30,7 @@
       button.dataset.state=stageState(i);button.querySelector('.run-step-status').textContent=states[stageState(i)];
       if (i===index && focus) button.focus();
     });
-    const visual = $('run-step-visual'), illustration = window.BEIRunVisual.render(index, snapshot);
+    const visual = $('run-step-visual'), illustration = window.BEIRunVisual.render(index, snapshot, lineage.outcomes);
     visual.hidden = !illustration; visual.innerHTML = illustration; visual.dataset.step = String(index);
     const detailVisual = $('run-detail-visual'), detailIllustration = window.BEIRunVisual.renderDetail(index, snapshot);
     detailVisual.hidden = !detailIllustration; detailVisual.innerHTML = detailIllustration; detailVisual.dataset.step = String(index);
