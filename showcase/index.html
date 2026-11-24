@@ -12,14 +12,14 @@
   <meta property="og:url" content="https://chaomacv.github.io/public-data-llm/">
   <meta property="og:image" content="https://chaomacv.github.io/public-data-llm/assets/project-preview.svg">
   <link rel="icon" href="assets/mark.svg" type="image/svg+xml">
-  <link rel="stylesheet" href="style.css">
-  <script src="locale-en.js" defer></script>
+  <link rel="stylesheet" href="style.css?v=review-20261124">
+  <script src="locale-en.js?v=review-20261124" defer></script>
   <script src="i18n.js" defer></script>
   <script src="model.js" defer></script>
   <script src="app.js" defer></script>
-  <script src="lineage.js" defer></script>
-  <script src="run-visual.js" defer></script>
-  <script src="run.js" defer></script>
+  <script src="lineage.js?v=review-20261124" defer></script>
+  <script src="run-visual.js?v=review-20261124" defer></script>
+  <script src="run.js?v=review-20261124" defer></script>
   <script src="gallery.js" defer></script>
   <script src="source-overview.js" defer></script>
   <script src="vendor/d3.v7.min.js" defer></script>
@@ -31,6 +31,7 @@
   <script src="enterprise-network.js" defer></script>
   <script src="story-portrait.js" defer></script>
   <script src="methods.js" defer></script>
+  <script src="review.js?v=review-20261124" defer></script>
 </head>
 <body>
   <a class="skip" href="#main">跳到主要内容</a>
@@ -136,15 +137,15 @@ link_distance = 220 - 160 * similarity</code></pre>
 <div class="portrait-business"><span class="portrait-provisional">PROVISIONAL · 暂定身份</span><div class="portrait-heading"><h4 id="portrait-name"></h4><span class="portrait-avatar" aria-hidden="true">企</span></div><p id="portrait-address"></p><div id="portrait-tags" class="portrait-tags"></div></div>
 <div id="portrait-timeline" class="portrait-timeline"></div>
 <p class="portrait-boundary">每条事实保留来源和阶段。未观察到某类事件，不代表该类事件不存在；拟认定也不等于已认定。</p>
-<footer class="notebook-scope">数量：全批已完成结果 · 画像包含临时身份 · 个体示例：仓库合成规则Demo，不是Qwen实测准确率</footer></div></article><article class="data-notebook" data-card-key="timeline" data-notebook="8" aria-roledescription="幻灯片" aria-label="9 / 9：处理进度与数据去向"><span class="notebook-category">数据去向</span><div class="notebook-page"><div class="notebook-heading"><span class="cell-number">[09]</span><div><h3>处理进度与数据去向</h3><p>按阶段看记录分流，按时间看推理进度；悬停圆点，查看数量、处理方法与后续去向。</p></div></div>
+<footer class="notebook-scope">数量：全批已完成结果 · 画像包含临时身份 · 个体示例：仓库合成规则Demo，不是Qwen实测准确率</footer></div></article><article class="data-notebook" data-card-key="timeline" data-notebook="8" aria-roledescription="幻灯片" aria-label="9 / 9：处理进度与数据去向"><span class="notebook-category">数据去向</span><div class="notebook-page"><div class="notebook-heading"><span class="cell-number">[09]</span><div><h3>处理进度与数据去向</h3><p>沿语义处理分支逐步筛选；悬停圆点，查看每步数量与分流原因。时间模式保留真实推理观测。</p></div></div>
 <div class="lineage-toolbar"><div class="lineage-mode" role="group" aria-label="数据去向探索视图"><button type="button" data-lineage-mode="flow" aria-pressed="true">数据去向</button><button type="button" data-lineage-mode="time" aria-pressed="false">时间进度</button></div><label id="lineage-scale-label">纵轴 <select id="lineage-scale" aria-label="数据去向纵轴刻度"><option value="log">对数</option><option value="linear">线性</option></select></label></div>
-<div class="lineage-reading"><strong id="lineage-count">388,348</strong><span id="lineage-unit">内容代表 · 个内容代表</span><span id="lineage-at">处理阶段 4 / 7</span></div>
+<div class="lineage-reading"><strong id="lineage-count">388,348</strong><span id="lineage-unit">内容代表 · 个内容代表</span><span id="lineage-at">处理阶段 4 / 4</span></div>
 <div id="gallery-timeline-chart" class="gallery-figure lineage-chart"></div>
 <p id="lineage-axis-note" class="lineage-axis-note"></p>
-<label class="space-control" for="lineage-scrub">选择节点 <input id="lineage-scrub" type="range" min="0" max="6" value="3"><output id="lineage-index" for="lineage-scrub">4 / 7</output></label>
+<label class="space-control" for="lineage-scrub">选择节点 <input id="lineage-scrub" type="range" min="0" max="3" value="3"><output id="lineage-index" for="lineage-scrub">4 / 4</output></label>
 <div id="lineage-info" class="lineage-info" role="status" aria-live="polite"></div>
 <div id="lineage-equations" class="lineage-equations"></div>
-<div class="notebook-callout">388,348 是复杂语义通道的内容代表数。推理后回填到 392,154 条来源，再与 14,420,658 条字段方案记录合并为 14,812,812 条处理台账。</div>
+<div class="notebook-callout">曲线止于语义通道的388,348个内容代表；14,420,658条字段方案记录另行处理。代表结果回填来源后，完整处理台账仍为14,812,812条。</div>
 <footer class="notebook-scope">数据去向：按阶段顺序 · 时间进度：实际观测 · 回填保留原始记录与来源 · <a href="assets/data-lineage.json">完整数量与去向 JSON ↗</a> · <a href="#pipeline">逐步输入输出 ↗</a></footer></div></article></div></div>
   <div class="carousel-controls shell"><button class="gallery-nav" id="gallery-prev" type="button" aria-label="上一个笔记本">←</button><div class="gallery-pagination" role="group" aria-label="选择数据笔记本"><button type="button" data-gallery-page="0" aria-label="第 1 个：来源分布与数据异构性" aria-pressed="true"><span></span></button><button type="button" data-gallery-page="1" aria-label="第 2 个：数据采集与安全控制" aria-pressed="false"><span></span></button><button type="button" data-gallery-page="2" aria-label="第 3 个：企业事件分类统计" aria-pressed="false"><span></span></button><button type="button" data-gallery-page="3" aria-label="第 4 个：数据层级与数量构成" aria-pressed="false"><span></span></button><button type="button" data-gallery-page="4" aria-label="第 5 个：公开数据处理方法" aria-pressed="false"><span></span></button><button type="button" data-gallery-page="5" aria-label="第 6 个：异构表格理解与统一提取" aria-pressed="false"><span></span></button><button type="button" data-gallery-page="6" aria-label="第 7 个：企业画像相似网络" aria-pressed="false"><span></span></button><button type="button" data-gallery-page="7" aria-label="第 8 个：企业画像与证据追溯" aria-pressed="false"><span></span></button><button type="button" data-gallery-page="8" aria-label="第 9 个：处理进度与数据去向" aria-pressed="false"><span></span></button></div><button class="gallery-nav" id="gallery-next" type="button" aria-label="下一个笔记本">→</button><span class="carousel-divider" aria-hidden="true"></span><button id="gallery-play" class="gallery-play" type="button" aria-pressed="true"><svg viewBox="0 0 20 20" width="16" height="16" aria-hidden="true"><path d="M7 5v10M13 5v10" stroke="currentColor" stroke-width="2"/></svg></button><span id="gallery-clock" class="gallery-clock">8s / 每张</span><span class="sr-only" id="gallery-announcement" role="status"></span></div>
 
@@ -245,6 +246,35 @@ else:
         <p class="run-footnote">数量已按2026-11-24质量更正更新，占位行单列质量剔除。两轮相关性排除统一归入文件筛选，历史执行台账保留。排除、复核及来源回填均保留台账；下方交互案例明确使用合成数据。<a href="assets/run-summary.json">查看汇总 JSON ↗</a></p>
       </div>
       <div class="architecture-bottom"><div><span class="bracket">[ LOCAL ]</span><p>本地 Qwen3-8B · 原始 BF16 权重。模型理解文件、生成字段方案并处理复杂内容，程序逐行复制和校验原值。</p></div><div><span class="bracket">[ TRACEABLE ]</span><p>大表采用流式 JSONL 与 DuckDB 聚合，Parquet 保存明细。CSV 用于导航，事件可追溯到记录、单元格与原附件。</p></div><div><span class="bracket">[ RESUMABLE ]</span><p>内容与配置签名控制续跑。有效检查点保留，失败、排除与复核分别记账；新方案留下独立版本与核验回执。</p></div></div>
+    </section>
+
+    <section class="section shell" id="review-mechanism" aria-labelledby="review-title">
+      <div class="section-intro"><div><p class="eyebrow">REVIEW MECHANISM / FOUR GATES</p><h2 id="review-title">审查机制：约束、对账、抽查与追溯。</h2></div><p>字段方案、来源核验与数量对账已有实现；增强规则和人工抽查明确作为方法设计，尚未形成独立语义准确率结论。</p></div>
+      <div class="review-pager"><div class="review-tabs" role="tablist" aria-label="审查机制分页">
+        <button id="review-tab-0" role="tab" aria-controls="review-panel-0" aria-selected="true" tabindex="0" data-review-tab="0"><span>01</span>逐表约束</button>
+        <button id="review-tab-1" role="tab" aria-controls="review-panel-1" aria-selected="false" tabindex="-1" data-review-tab="1"><span>02</span>逐条对账</button>
+        <button id="review-tab-2" role="tab" aria-controls="review-panel-2" aria-selected="false" tabindex="-1" data-review-tab="2"><span>03</span>人工抽查</button>
+        <button id="review-tab-3" role="tab" aria-controls="review-panel-3" aria-selected="false" tabindex="-1" data-review-tab="3"><span>04</span>证据追溯</button>
+      </div>
+      <article class="review-panel" id="review-panel-0" role="tabpanel" aria-labelledby="review-tab-0">
+       <div><p class="overline">01 / SCHEMA &amp; EVIDENCE</p><h3>每张表，先理解规则，再核对输出。</h3><span class="review-status">已有字段方案与来源核验 · 类型及单位校验为增强设计</span><p>本地LLM通过文件卡片选择主体、证据字段、条件词和阶段词，生成有限的声明式方案。程序执行条件并引用原值，模型不生成任意代码或正则。</p><div class="review-route"><span>文件卡片</span><i>→</i><span>模型设计字段与条件</span><i>→</i><span>程序执行及核验</span></div><p>能用规则表达的进入程序通道；需要逐条理解的进入复杂语义通道；结构或含义不足的保留复核。</p><p class="review-note">公司后缀和字数只适合作异常提示。机构、合伙企业、联合体及自然人应核对主体角色，不能靠“公司”两字决定收录或排除。</p></div>
+       <div class="review-exhibit"><h4>采购中标表：约束示例</h4><span class="review-caption">合成示意 · 原值引用已有实现，以下组合展示规则设计</span><div class="review-rule"><strong>主体归属</strong><p>中标单位引用本行“中标单位”列，不能误取“采购人”或“项目名称”；主体类型不明确则复核。</p></div><div class="review-rule"><strong>金额与单位</strong><p>中标金额“120万元”不能替换成预算“500万元”。保留原值和字段来源；数值解析、单位一致性及换算属于增强设计，缺失金额不补零。</p></div><div class="review-rule"><strong>阶段与否定</strong><p>“已中标”与“拟中标／候选”区分阶段；“未中标／废标”不生成已中标事实。条件词随具体表的字段与语境设计。</p></div><p class="review-note">公示日期与决定日期也要分别映射。格式正确和引用存在，仍需结合业务语义核对。</p></div>
+      </article>
+      <article class="review-panel" id="review-panel-1" role="tabpanel" aria-labelledby="review-tab-1" hidden>
+       <div><p class="overline">02 / RECORD ACCOUNTING</p><h3>每条记录，一份去向台账。</h3><span class="review-status">已实现 · 更正版覆盖对账</span><p>记录编号连接文件、处理单元与原始位置。排除、质量剔除、收录、无事件和待复核分别留痕；已处理编号用于检查重复写入和遗漏。</p><p>精确去重只减少重复理解，原始来源映射继续保留；拆批后核对编号集合，复核项也有明确去向。</p><p class="review-note">对账证明已知记录有去向；独立语义正确率另行评测。</p></div>
+       <div class="review-exhibit"><h4>本批数量守恒</h4><div id="review-accounting" class="review-accounting"></div><div class="review-route"><span>记录编号</span><i>→</i><span>唯一处理状态</span><i>→</i><span>来源与版本</span></div><p class="review-note">待复核已包含在处理台账中；事件数、画像数与记录数分别计量。</p></div>
+      </article>
+      <article class="review-panel" id="review-panel-2" role="tabpanel" aria-labelledby="review-tab-2" hidden>
+       <div><p class="overline">03 / HUMAN ACCEPTANCE</p><h3>随机抽查，发现问题后有退出机制。</h3><span class="review-status is-design">建议方案 · 尚未执行人工抽查</span><p>按同一来源、字段方案和模型版本划分同质审核批次，单批建议不超过1万条。先选择代表性批次试行，再按风险与人工预算扩展。</p><ul class="review-list"><li>每批随机抽150条；不足150条则全检。核对主体、事件、阶段、金额日期与证据。数量是可配置建议。</li><li>另加抽30条高风险记录：否定、撤销、金额单位、多人多主体和罕见事件。风险样本单独报告，不混入随机样本估计。</li><li>排除文件也要抽查：建议另选20个单元检查卡片及原件，避免只检查已提取结果而漏掉误排除。</li><li>抽查标准事先确定，疑难样本由两人复核并裁决；保留标注、分歧和整改记录。</li></ul>
+        <div class="review-recovery"><strong>出现关键语义错误时</strong><p>暂停该批 → 定位字段、规则或语境问题 → 修复并留下版本 → 错例回归 → 重跑受影响范围 → 用新随机样本复验。</p><p>建议最多两轮有针对性的修复；仍不通过则隔离该作用域，降级为保留原文和待复核，交人工裁决，不无限重复同一推理。</p></div>
+       </div>
+       <div class="review-exhibit"><h4>抽样能发现多少问题？</h4><span class="review-caption">方案计算器 · 假设值，不是实测准确率</span><label class="review-control">随机样本量 n <input id="review-sample-n" type="range" min="50" max="300" step="10" value="150"><output id="review-sample-n-value">150</output></label><label class="review-control">真实错误率假设 <select id="review-error-rate"><option value="0.01">1%</option><option value="0.02" selected>2%</option><option value="0.05">5%</option></select></label><div class="review-probability"><strong id="review-detection">95.2%</strong><span>至少发现1个错误的概率</span></div><div class="review-formula">P(detect ≥ 1) = 1 − (1 − p)<sup>n</sup></div><p class="review-note">均匀随机抽取、同质批次足够大时的二项近似。零错样本也不保证整批无错；风险加抽不代入本公式。任何关键语义错误都应暂停放行，复验使用新样本。</p><p class="review-reference">计算参考 <a href="https://www.itl.nist.gov/div898/handbook/pmc/section2/pmc232.htm" target="_blank" rel="noopener">NIST Acceptance Sampling</a>；150／30／20与两轮上限均为本项目建议参数。</p></div>
+      </article>
+      <article class="review-panel" id="review-panel-3" role="tabpanel" aria-labelledby="review-tab-3" hidden>
+       <div><p class="overline">04 / SOURCE PROVENANCE</p><h3>标签来自事实，事实连回证据。</h3><span class="review-status">私有结果可追溯 · 公开交互使用合成示例</span><p>通过企业画像与事件，回到来源记录、原字段及原始附件。查看证据时核对主体、阶段和上下文；投诉、拟议与历史事项保留原意。</p><p>原值、来源位置和文件哈希保留；处理方案、模型与提示词版本关联检查点，变更后重做受影响范围的验证。</p><a class="text-link" href="#evidence">查看证据演示</a><p class="review-note">可追溯性支持复核与纠错，语义正确性仍需人工标注评估。私有原文不发布到展示页。</p></div>
+       <div class="review-exhibit"><h4>沿来源链，回到原件</h4><ol class="review-evidence-chain"><li>画像标签</li><li>事实事件与阶段</li><li>来源记录与字段引用</li><li>原始附件与来源页面</li></ol><code class="review-source-key">file_id / scope_id / record_id / field</code><p class="review-reference">监督与来源追溯参考 <a href="https://nvlpubs.nist.gov/nistpubs/ai/NIST.AI.600-1.pdf" target="_blank" rel="noopener">NIST AI 600-1</a>。上述人工验收参数是项目设计，不是NIST规定。</p></div>
+      </article></div>
+      <div class="review-version-strip"><strong>贯穿全程：版本与回归</strong><span>文件哈希 · 解析器版本 · 字段方案 · 模型及提示词 · 独立更正版导出</span></div>
     </section>
 
     <section class="section shell field-notes" id="field-notes" aria-labelledby="field-notes-title">

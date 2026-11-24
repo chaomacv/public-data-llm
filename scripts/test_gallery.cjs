@@ -168,7 +168,7 @@ test('lineage conserves every routing branch and matches its exact source export
  assert.equal(lineage.counts.retained,final.counts.record_ledger);
  assert.equal(lineage.counts.mapped,final.preparation.field_mapped_records);
  assert.equal(lineage.stages.length,9);
- assert.deepEqual(lineage.flow_points.map(p=>p.count),[43653625,14812812,392154,388348,392154,14812812,43653625]);
+ assert.deepEqual(lineage.flow_points.map(p=>p.count),[43653625,14812812,392154,388348]);
  assert.equal(lineage.outcomes.REVIEW,6179034);
  assert.ok(!/password|10\.126\.|\/opt\/|"cells"|"record_id"/.test(JSON.stringify(lineage)));
 });
@@ -178,8 +178,8 @@ test('stage order and actual inference time remain distinct while both chart sca
  assert.ok(m.series(d,'flow').every(p=>p.at===undefined));
  assert.deepEqual(m.series(d,'time').map(p=>p.count),d.progress.points.map(p=>p.completed));
  for(const log of [true,false]){
-  const p=m.positions(d,'flow',log).points;assert.equal(p[3].count,388348);assert.equal(p[4].count,392154);
-  assert.ok(p[3].y>p[4].y);assert.ok(p[0].y<p[1].y);assert.ok(p.every(n=>Number.isFinite(n.x)&&Number.isFinite(n.y)));
+  const p=m.positions(d,'flow',log).points;assert.equal(p[3].count,388348);assert.equal(p[2].count,392154);
+  assert.ok(p[3].y>p[2].y);assert.ok(p[0].y<p[1].y);assert.ok(p.every(n=>Number.isFinite(n.x)&&Number.isFinite(n.y)));
  }
  const p=m.positions(d,'time',false).points;
  assert.ok(p[1].x-p[0].x < p[6].x-p[5].x);
@@ -224,7 +224,7 @@ test('first four stage illustrations distinguish source files, reading inputs an
  const examples=m.render(3,d);assert.equal((examples.match(/data-plan-mode=/g)||[]).length,4);
  for(const label of ['程序提取','仅主体信息','模型逐条理解','待复核','1,347','408','382','475'])assert.ok(examples.includes(label));
  assert.match(examples,/甲公司拟获支持/);assert.match(examples,/企业？项目？/);assert.ok(!examples.includes('run-screen-track'));
- for(let i=0;i<9;i++)if(i!==2)assert.equal(m.renderDetail(i,d),'');
+ for(let i=0;i<9;i++)if(i!==2&&i!==4)assert.equal(m.renderDetail(i,d),'');
  const semantic=m.render(5,d);assert.equal((semantic.match(/<li>/g)||[]).length,5);
  for(const step of ['组织输入','精确去重','本地模型提取','程序核验','逐来源回填'])assert.ok(semantic.includes(step));
  assert.ok(semantic.includes('不确定项进入复核'));
@@ -286,4 +286,24 @@ test('identity, export and acceptance diagrams use reconciled result counts and 
  const badResult=structuredClone(d);badResult.final_counts.record_ledger++;assert.throws(()=>m.resultCounts(badResult));
  const unverified=structuredClone(d);unverified.validation.exports_round_trip_validated=false;
  assert.equal((m.render(8,unverified,l.outcomes).match(/data-passed="true"/g)||[]).length,2);
+});
+
+
+test('review calculator states explicit assumptions and the flow only decreases on one branch',()=>{
+ const r=require('../showcase/review.js'),m=require('../showcase/lineage.js'),d=require('../showcase/assets/data-lineage.json');
+ assert.ok(Math.abs(r.detectionProbability(150,.02)-(1-.98**150))<1e-12);
+ assert.equal((r.detectionProbability(150,.02)*100).toFixed(1),'95.2');
+ assert.equal(r.detectionProbability(150,0),0);assert.equal(r.detectionProbability(150,1),1);
+ assert.ok(r.detectionProbability(300,.02)>r.detectionProbability(150,.02));
+ for(const args of [[0,.02],[10,-.1],[10,1.1],[1.5,.02]])assert.throws(()=>r.detectionProbability(...args));
+ assert.equal(r.nextTab(3,'ArrowRight'),0);assert.equal(r.nextTab(0,'ArrowLeft'),3);assert.equal(r.nextTab(1,'End'),3);
+ assert.ok(d.flow_points.every((p,i)=>!i||p.count<=d.flow_points[i-1].count));
+ const bad=structuredClone(d);bad.flow_points.reverse();assert.throws(()=>m.validate(bad));
+ const run=require('../showcase/run-visual.js'),snapshot=require('../showcase/assets/run-summary.json');
+ const examples=run.renderDetail(4,snapshot);assert.equal((examples.match(/class="run-route-example"/g)||[]).length,4);
+ assert.match(examples,/合成示意/);assert.match(examples,/本次检查未发现违法行为/);
+ const html=fs.readFileSync(require('node:path').join(__dirname,'../showcase/index.html'),'utf8');
+ assert.ok(html.indexOf('id="review-mechanism"')>html.indexOf('id="pipeline"'));
+ assert.ok(html.indexOf('id="review-mechanism"')<html.indexOf('id="field-notes"'));
+ for(const key of ['尚未执行人工抽查','新随机样本复验','最多两轮','不是NIST规定','pmc232.htm','NIST.AI.600-1.pdf'])assert.ok(html.includes(key));
 });

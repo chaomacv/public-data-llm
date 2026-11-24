@@ -103,6 +103,15 @@
    return heading('从文件筛选，到处理分流')+'<div class="run-screen-total"><strong>'+fmt(s.total_units)+'</strong><span>独立处理单元</span></div><div class="run-screen-track" role="img" aria-label="筛选排除 '+fmt(s.excluded_units)+'，继续处理 '+fmt(s.continuing_units)+'"><i style="width:'+pct.toFixed(4)+'%"></i><i style="width:'+(100-pct).toFixed(4)+'%"></i></div><div class="run-screen-outcomes"><div><span>筛选排除</span><strong>'+fmt(s.excluded_units)+'</strong></div><div><span>继续处理</span><strong>'+fmt(s.continuing_units)+'</strong></div></div><p class="run-screen-kept"><span>提取通道 '+fmt(s.actionable_units)+'</span><b aria-hidden="true">+</b><span>待复核 '+fmt(s.review_units)+'</span></p>';
  }
  function renderDetail(index,d){
+  if(index===4){
+   const examples=[
+    ['字段方案','采购中标表','中标单位、项目、中标金额分别成列。','确认字段含义后，程序逐行引用原值。'],
+    ['字段方案','企业基本信息表','企业名称、信用代码、地址分别成列。','保留主体资料，不凭空生成事件。'],
+    ['复杂语义','一句话包含多个主体','合成甲公司拟获支持；合成乙公司已获批准。','交给模型区分主体与对应阶段。'],
+    ['复杂语义','当前结果与历史情况交织','合成丙公司本次检查未发现违法行为；此前曾被责令整改。','区分当前检查与历史信息，不推断本次处罚。']
+   ];
+   return heading('两条处理通道，各看两个例子','合成示意')+'<div class="run-route-examples">'+examples.map(([route,title,input,action])=>'<section class="run-route-example"><span>'+route+'</span><h4>'+title+'</h4><p>'+input+'</p><small>'+action+'</small></section>').join('')+'</div>';
+  }
   if(index===2)return heading('模型看到的文件卡片','结构示例')+'<dl class="run-card-example"><dt>文件</dt><dd data-i18n-original>某区企业处罚公示.xlsx</dd><dt>工作表</dt><dd>处罚结果</dd><dt>追溯</dt><dd><code>file_id / scope_id</code></dd><dt>记录数</dt><dd>按完整读取计数</dd><dt>字段</dt><dd>企业名称、处罚文号、违法事实、处罚日期</dd><dt>样本</dt><dd>首3 · 中3 · 尾3 · 随机5，合并去重</dd><dt>来源</dt><dd>原始附件／压缩包成员</dd><dt>质量</dt><dd>表头待确认、列宽异常等标记</dd></dl>';
   return '';
  }

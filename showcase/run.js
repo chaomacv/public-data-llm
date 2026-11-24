@@ -34,6 +34,7 @@
     visual.hidden = !illustration; visual.innerHTML = illustration; visual.dataset.step = String(index);
     const detailVisual = $('run-detail-visual'), detailIllustration = window.BEIRunVisual.renderDetail(index, snapshot);
     detailVisual.hidden = !detailIllustration; detailVisual.innerHTML = detailIllustration; detailVisual.dataset.step = String(index);
+    detailVisual.setAttribute('aria-label',index===4?'处理通道示例':'文件卡片示例');
     $('run-detail-bottom').classList.toggle('has-visual', Boolean(detailIllustration));
     $('run-step-panel').setAttribute('aria-labelledby',buttons[index].id);
     $('run-detail-state').textContent=states[state];$('run-detail-state').dataset.state=state;
@@ -60,7 +61,7 @@
     $('html-story-example').textContent=text?'合成HTML有限公司已处罚，罚款100元。':'<p class="notice">合成<span>HTML</span>有限公司已处罚，罚款100元。</p>';
     document.querySelectorAll('[data-html-view]').forEach(item=>item.setAttribute('aria-pressed',String(item===button)));
   }));
-  Promise.all(['run-summary.json','data-lineage.json'].map(name=>fetch('assets/'+name).then(response=>{
+  Promise.all(['run-summary.json','data-lineage.json'].map(name=>fetch('assets/'+name+'?v=review-20261124').then(response=>{
     if(!response.ok)throw new Error('Aggregate snapshot unavailable');return response.json();
   }))).then(([data,flow])=>{
     lineage=window.BEILineage.validate(flow);
