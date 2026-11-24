@@ -26,6 +26,10 @@ def build(assets):
         assert c[row['total']] == sum(c[key] for key in row['parts'])
     assert sum(outcomes.values()) == c['retained'] == final['counts']['record_ledger']
     assert c['representatives'] == gallery['progress']['total']
+    screening = run['screening']
+    assert screening['total_units'] == run['input']['scopes']
+    assert screening['total_units'] == screening['keep_units'] + screening['review_units'] + screening['excluded_units']
+    assert screening['planned_units'] == screening['keep_units'] + screening['review_units'] == run['plans']['total']
     n = lambda key: f'{c[key]:,}'
     stages = [
         {'title': '固定输入', 'input': '5,200 份已接收原始附件',
@@ -38,14 +42,15 @@ def build(assets):
                   '可解析文件包括直接读取的原文件、解压成员和必要的转换结果；每条来源处理链统计实际读取的文件。'],
          'files': ['02_profiles/文件总表.csv', '02_profiles/all_profiles_native.json']},
         {'title': '文件筛选', 'input': '文件名、表头及分层样本组成的文件卡片',
-         'output': '逐独立处理单元保留、排除或复核判断，传入字段方案。',
+         'output': '13,281 个独立处理单元：保留 9,243／待复核 308／初筛排除 3,730；9,551 个进入字段方案。',
          'flow': ['模型先判断文件主题，不能把抽样行数当作完整文件记录数。',
                   '排除记录在03–05合并对账，不把总排除量虚分到单个筛选步骤。'],
-         'files': ['03_screen/筛选总表.csv', '03_screen/scopes/']},
-        {'title': '字段方案', 'input': '相关或需继续规划的独立处理单元与样本',
-         'output': '9,551 份方案：映射 1,347／主体信息 408／逐行语义 382／排除 6,939／复核 475。',
-         'flow': ['模型理解字段和条件，确定哪些记录可由程序执行、哪些需要逐条语义处理。',
-                  '方案数按独立处理单元计量，不与记录条数直接相减。'],
+         'files': ['03_screen/筛选总表.csv', '03_screen/scopes/', '03_screen/progress.json']},
+        {'title': '字段方案', 'input': '03步保留的 9,243 个单元 + 待复核的 308 个单元，共 9,551 个；每个单元制定一份方案。',
+         'output': '程序提取 1,347／仅主体信息 408／模型逐条理解 382／进一步排除 6,939／待复核 475，合计 9,551 份处理方案。',
+         'flow': ['13,281 − 3,730 = 9,551；初筛保留与待复核单元继续规划。',
+                  '一单元一方案：确定提取哪些字段、满足什么条件，以及使用程序还是逐条模型理解。',
+                  '进一步排除发生在字段理解之后，与03步初筛排除分开统计；方案数不是记录条数。'],
          'files': ['04_plans/字段方案总表.csv', '04_plans/config.json']},
         {'title': '完整读取与分流', 'input': f"{n('known')} 条已知逻辑记录及03–04决策",
          'output': f"排除 {n('excluded')}；保留 {n('retained')} = 字段方案 {n('mapped')} + 复杂语义来源 {n('semantic')}。",

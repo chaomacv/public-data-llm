@@ -476,3 +476,24 @@ test('language controls preserve notebook interaction, translate new content and
  await page.locator('.design-credit').scrollIntoViewIfNeeded();
  await page.screenshot({path:info.outputPath('design-credit-chinese.png')});
 });
+
+
+test('first four processing steps explain files, cards and the screening-to-plan transition',async({page},info)=>{
+ await page.goto('/?lang=zh#pipeline');await expect(page.locator('#run-lineage-table')).toHaveAttribute('data-ready','true');
+ const visual=page.locator('#run-step-visual');
+ for(let i=0;i<4;i++){
+  await page.locator(`[data-run-step="${i}"]`).click();
+  await expect(visual).toBeVisible();await expect(visual).toHaveAttribute('data-step',String(i));
+  if(i===0)for(const type of ['CSV','DOCX','PDF','RAR'])await expect(visual).toContainText(type);
+  if(i===1){await expect(visual.locator('.is-read')).toHaveCount(3);await expect(visual).toContainText('C.xlsx');await expect(visual).toContainText('E.jsonl');}
+  if(i===2){await expect(visual).toContainText('结构示例');await expect(visual).toContainText('scope_id');await expect(visual).toContainText('首3 · 中3 · 尾3 · 随机5');}
+  if(i===3){await expect(visual).toContainText('13,281');await expect(visual).toContainText('3,730');await expect(visual).toContainText('9,551');await expect(page.locator('#run-detail-input')).toContainText('9,243');await expect(page.locator('#run-detail-input')).toContainText('308');await expect(page.locator('#run-detail-number')).toHaveText('9,551');}
+  if(page.viewportSize().width>900){const side=await visual.boundingBox(),detail=await page.locator('#run-step-panel').boundingBox();expect(side.x+side.width).toBeLessThan(detail.x);}
+  expect(await page.evaluate(()=>document.documentElement.scrollWidth)).toBeLessThanOrEqual(page.viewportSize().width+1);
+  await page.locator('.run-explorer').screenshot({path:info.outputPath('pipeline-step-0'+(i+1)+'.png')});
+ }
+ await page.locator('[data-language="en"]').click();await expect(visual).toContainText('From screening');
+ await expect(page.locator('#run-detail-input')).toContainText('9,551');await expect(page.locator('#run-detail-label')).toContainText('processing units');
+ await page.locator('[data-run-step="2"]').click();await expect(visual).toContainText('The file card seen by the model');await expect(visual).toContainText('某区企业处罚公示.xlsx');
+ await page.locator('[data-run-step="4"]').click();await expect(visual).toBeHidden();
+});

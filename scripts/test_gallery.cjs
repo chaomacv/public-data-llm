@@ -176,3 +176,23 @@ test('inconsistent lineage counts or fabricated stage timestamps cannot be prese
  }
  assert.throws(()=>m.series(d,'unknown'));
 });
+
+test('screening reconciles units kept or deferred with one field plan per continuing unit',()=>{
+ const d=require('../showcase/assets/run-summary.json'),m=require('../showcase/run-visual.js');
+ assert.equal(m.validateScreening(d),d.screening);
+ assert.equal(d.screening.total_units-d.screening.excluded_units,d.plans.total);
+ assert.equal(Object.entries(d.plans).filter(([k])=>k!=='total').reduce((n,[,v])=>n+v,0),d.plans.total);
+ for(const mutate of [x=>x.screening.excluded_units++,x=>x.screening.review_units--,x=>x.plans.total++]){
+  const copy=structuredClone(d);mutate(copy);assert.throws(()=>m.validateScreening(copy));
+ }
+ assert.match(m.render(3,d),/13,281/);assert.match(m.render(3,d),/3,730/);assert.match(m.render(3,d),/9,551/);
+});
+
+test('first four stage illustrations distinguish source files, reading inputs and synthetic file cards',()=>{
+ const m=require('../showcase/run-visual.js'),d=require('../showcase/assets/run-summary.json');
+ assert.match(m.render(0,d),/CSV/);assert.match(m.render(0,d),/DOCX/);assert.match(m.render(0,d),/PDF/);assert.match(m.render(0,d),/RAR/);
+ const diagram=m.render(1,d);assert.equal((diagram.match(/is-read/g)||[]).length,3);
+ for(const name of ['A.csv','B.zip','C.xlsx','D.jpg','E.jsonl'])assert.ok(diagram.includes(name));
+ const card=m.render(2,d);assert.match(card,/结构示例/);assert.match(card,/scope_id/);assert.match(card,/随机5/);
+ for(let i=4;i<9;i++)assert.equal(m.render(i,d),'');
+});

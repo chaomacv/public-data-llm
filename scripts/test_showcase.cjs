@@ -88,7 +88,7 @@ test('public corpus snapshot contains only aggregate metadata and keeps pending 
   assert.equal(snapshot.kind, 'aggregate_run_snapshot');
   assert.equal(snapshot.semantic_accuracy_evaluated, false);
   assert.match(snapshot.source_commit, /^[a-f0-9]{40}$/);
-  assert.deepEqual(Object.keys(snapshot).sort(), ['schema_version','kind','snapshot_date','updated_at','source_commit','pipeline_status','semantic_accuracy_evaluated','input','plans','preparation','semantic_work','model','validation','benchmarks','final_counts'].sort());
+  assert.deepEqual(Object.keys(snapshot).sort(), ['schema_version','kind','snapshot_date','updated_at','source_commit','pipeline_status','semantic_accuracy_evaluated','input','screening','plans','preparation','semantic_work','model','validation','benchmarks','final_counts'].sort());
   const {input, preparation, semantic_work, plans} = snapshot;
   for (const section of [input,preparation,semantic_work,plans]) {
     for (const value of Object.values(section)) assert.ok(Number.isSafeInteger(value) && value >= 0);
