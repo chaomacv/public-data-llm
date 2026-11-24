@@ -512,5 +512,13 @@ test('first four processing steps explain files, cards and the screening-to-plan
  await page.locator('[data-language="en"]').click();await expect(visual).toContainText('Four processing routes');
  await expect(page.locator('#run-detail-input')).toContainText('2,612');await expect(page.locator('#run-detail-label')).toContainText('processing routes');
  await page.locator('[data-run-step="2"]').click();await expect(page.locator('#run-detail-visual')).toContainText('The file card seen by the model');await expect(page.locator('#run-detail-visual')).toContainText('某区企业处罚公示.xlsx');expect(await page.locator('#run-detail-visual dt').evaluateAll(labels=>labels.some(el=>{const range=document.createRange();range.selectNodeContents(el);return new Set([...range.getClientRects()].map(r=>Math.round(r.top))).size>1;}))).toBe(false);await expect(visual).toContainText('From file screening');
- await page.locator('[data-run-step="4"]').click();await expect(visual).toBeHidden();await expect(page.locator('#run-detail-visual')).toBeHidden();
+ await page.locator('[data-run-step="4"]').click();await expect(visual).toBeVisible();await expect(page.locator('#run-detail-visual')).toBeHidden();
+ await expect(visual).toContainText('From processing units');
+ for(const value of ['2,612','15,861,277','14,420,658','1,440,619'])await expect(visual).toContainText(value);
+ await expect(visual).toContainText('Includes review records');
+ expect(await page.evaluate(()=>document.documentElement.scrollWidth)).toBeLessThanOrEqual(page.viewportSize().width+1);
+ await page.locator('.run-explorer').screenshot({path:info.outputPath('pipeline-step-05-english.png')});
+ await page.locator('[data-language="zh"]').click();await expect(visual).toContainText('从处理单元，到完整记录');await expect(visual).toContainText('含待复核');
+ await page.locator('.run-explorer').screenshot({path:info.outputPath('pipeline-step-05.png')});
+ await page.locator('[data-run-step="5"]').click();await expect(visual).toBeHidden();
 });

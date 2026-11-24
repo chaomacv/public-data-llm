@@ -195,6 +195,19 @@ input[type="checkbox"] { width: 14px; height: 14px; accent-color: var(--blue); }
 .run-step-rail { min-width:0; }
 .run-step-visual { margin-top:22px; padding:18px 16px 4px; border-top:1px solid var(--line); background:linear-gradient(#fafbfc,#fff); }
 .run-step-visual[hidden] { display:none; }
+.run-record-flow { padding:2px 0 13px; }
+.run-record-unit { display:flex; align-items:baseline; justify-content:center; flex-wrap:wrap; gap:6px 10px; padding:10px; border:1px solid #e0e6ef; background:#fff; }
+.run-record-unit strong { font:22px/1.3 var(--mono); }.run-record-unit span { font-size:13px; color:var(--muted); }
+.run-record-connector { width:1px; height:18px; margin:auto; background:#b7c5db; }
+.run-record-total { display:flex; flex-direction:column; align-items:center; gap:5px; padding:15px 8px; border:1px solid #d8e2f5; background:#eff3fc; }
+.run-record-total strong { font:clamp(23px,2.4vw,32px)/1.3 var(--mono); letter-spacing:-1px; color:#344e82; }.run-record-total span { font-size:13px; color:#6f81a4; }
+.run-record-split { position:relative; display:grid; grid-template-columns:repeat(2,minmax(0,1fr)); gap:12px; padding-top:20px; }
+.run-record-split:before { content:""; position:absolute; top:10px; left:calc(25% - 3px); right:calc(25% - 3px); height:1px; background:#b7c5db; }
+.run-record-split:after { content:""; position:absolute; top:0; left:50%; width:1px; height:10px; background:#b7c5db; }
+.run-record-branch { position:relative; min-width:0; padding:11px 7px; border:1px solid #dce4f3; background:#fff; text-align:center; }
+.run-record-branch:before { content:""; position:absolute; top:-10px; left:50%; width:1px; height:10px; background:#b7c5db; }
+.run-record-branch>span { display:block; font-size:13px; color:#546a92; }.run-record-branch strong { display:block; margin-top:6px; font:clamp(14px,1.15vw,19px)/1.4 var(--mono); color:#4269d0; white-space:nowrap; }.run-record-branch small { display:block; margin-top:4px; font-size:11px; color:var(--muted); }
+.run-record-branch+.run-record-branch { border-color:#e4dff1; }.run-record-branch+.run-record-branch>span,.run-record-branch+.run-record-branch strong { color:#8a72b4; }
 .run-detail-bottom.has-visual { display:grid; grid-template-columns:minmax(0,1fr); gap:22px; align-items:start; }
 .run-detail-artifacts { min-width:0; }
 .run-detail-visual { min-width:0; padding:17px 14px 9px; border-top:1px solid var(--line); background:linear-gradient(#fafbfc,#fff); }

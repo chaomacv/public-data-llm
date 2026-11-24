@@ -1,4 +1,4 @@
-/* Compact, source-counted illustrations for the first four processing stages. */
+/* Compact, source-counted illustrations for the processing stages. */
 (function(root,factory){
  const api=factory();if(typeof module==='object'&&module.exports)module.exports=api;
  if(root.document)root.BEIRunVisual=api;
@@ -30,6 +30,12 @@
   return {total_units:s.total_units,excluded_units:excluded,continuing_units:actionable+p.review,
    actionable_units:actionable,review_units:p.review};
  }
+ function readingFlow(d){
+  const units=screeningView(d).continuing_units,p=d.preparation;
+  if(![p.retained_records,p.field_mapped_records,p.pending_semantic_source_records].every(n=>Number.isSafeInteger(n)&&n>=0)||
+   p.retained_records!==p.field_mapped_records+p.pending_semantic_source_records)throw Error('Reading routes do not reconcile');
+  return {units,total:p.retained_records,field:p.field_mapped_records,semantic:p.pending_semantic_source_records};
+ }
  function render(index,d){
   if(index===0)return heading('多种格式，同一份输入台账')+'<div class="run-format-icons">'+['CSV','XLSX','DOCX','PDF','JPG','RAR'].map(type=>'<div class="run-format-item">'+icon(type)+'<span>'+type+'</span></div>').join('')+'</div><p class="run-visual-caption">原件保留，来源与哈希一起登记。</p>';
   if(index===1)return heading('每条来源，统计实际读取的文件','示意')+'<div class="run-read-head"><span>原始附件</span><span>实际读取</span></div><div class="run-read-rows">'+[['A.csv','A.csv','直接读取'],['B.zip','C.xlsx','解压'],['D.jpg','E.jsonl','OCR']].map(([source,target,method])=>'<div class="run-read-row">'+tile(source)+'<div class="run-read-route"><span>'+method+'</span><i aria-hidden="true">→</i></div>'+tile(target,true)+'</div>').join('')+'</div><p class="run-visual-caption"><span class="run-blue-key" aria-hidden="true"></span>蓝色文件计数；原件留作来源。</p>';
@@ -44,6 +50,10 @@
    ];
    return heading('四类处理方式，四个小例子','说明示例')+'<div class="run-plan-examples">'+examples.map(([mode,title,example,caption])=>'<section class="run-plan-example" data-plan-mode="'+mode+'"><div class="run-plan-example-heading"><h4>'+title+'</h4><span>'+fmt(d.plans[mode])+'</span></div>'+example+'<p class="run-plan-caption">'+caption+'</p></section>').join('')+'</div>';
   }
+  if(index===4){
+   const f=readingFlow(d);
+   return heading('从处理单元，到完整记录')+'<div class="run-record-flow"><div class="run-record-unit"><strong>'+fmt(f.units)+'</strong><span>独立处理单元</span></div><div class="run-record-connector" aria-hidden="true"></div><div class="run-record-total"><strong>'+fmt(f.total)+'</strong><span>条记录</span></div><div class="run-record-split"><div class="run-record-branch"><span>字段方案</span><strong>'+fmt(f.field)+'</strong><small>含待复核</small></div><div class="run-record-branch"><span>复杂语义来源</span><strong>'+fmt(f.semantic)+'</strong></div></div></div>';
+  }
   return '';
  }
  function renderScreening(d){
@@ -54,5 +64,5 @@
   if(index===2)return heading('模型看到的文件卡片','结构示例')+'<dl class="run-card-example"><dt>文件</dt><dd data-i18n-original>某区企业处罚公示.xlsx</dd><dt>工作表</dt><dd>处罚结果</dd><dt>追溯</dt><dd><code>file_id / scope_id</code></dd><dt>记录数</dt><dd>按完整读取计数</dd><dt>字段</dt><dd>企业名称、处罚文号、违法事实、处罚日期</dd><dt>样本</dt><dd>首3 · 中3 · 尾3 · 随机5，合并去重</dd><dt>来源</dt><dd>原始附件／压缩包成员</dd><dt>质量</dt><dd>表头待确认、列宽异常等标记</dd></dl>';
   return '';
  }
- return {render,renderDetail,validateScreening,screeningView};
+ return {render,renderDetail,validateScreening,screeningView,readingFlow};
 });

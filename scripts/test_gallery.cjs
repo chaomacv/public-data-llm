@@ -204,5 +204,14 @@ test('first four stage illustrations distinguish source files, reading inputs an
  for(const label of ['程序提取','仅主体信息','模型逐条理解','待复核','1,347','408','382','475'])assert.ok(examples.includes(label));
  assert.match(examples,/甲公司拟获支持/);assert.match(examples,/企业？项目？/);assert.ok(!examples.includes('run-screen-track'));
  for(let i=0;i<9;i++)if(i!==2)assert.equal(m.renderDetail(i,d),'');
- for(let i=4;i<9;i++)assert.equal(m.render(i,d),'');
+ for(let i=5;i<9;i++)assert.equal(m.render(i,d),'');
+});
+
+
+test('full-reading diagram derives units and both record routes without treating review as extracted facts',()=>{
+ const m=require('../showcase/run-visual.js'),d=require('../showcase/assets/run-summary.json');
+ assert.deepEqual(m.readingFlow(d),{units:2612,total:15861277,field:14420658,semantic:1440619});
+ const graph=m.render(4,d);for(const value of ['2,612','15,861,277','14,420,658','1,440,619','含待复核'])assert.ok(graph.includes(value));
+ assert.equal((graph.match(/class="run-record-branch"/g)||[]).length,2);
+ const bad=structuredClone(d);bad.preparation.field_mapped_records++;assert.throws(()=>m.readingFlow(bad));
 });
