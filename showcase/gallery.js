@@ -17,6 +17,11 @@
   const text = (x,y,s,attrs='') => `<text x="${x}" y="${y}" ${attrs}>${esc(s)}</text>`;
   const svg = (body, label, width=720, height=340) => `<svg viewBox="0 0 ${width} ${height}" role="img" aria-label="${esc(label)}"><title>${esc(label)}</title>${body}</svg>`;
 
+  function dedupLayout(d) {
+    const uniqueHeight=200*d.representative_records/d.source_records;
+    return {uniqueHeight,duplicateHeight:200-uniqueHeight,duplicateTop:100+uniqueHeight};
+  }
+
   function eventGroups(rows, state='all') {
     const groups = new Map();
     for (const r of rows) {
@@ -83,12 +88,12 @@
     renderEvents();
 
     const dedup=data.dedup, ratio=dedup.representative_records/dedup.source_records;
-    const uniqueHeight=200*ratio, duplicateHeight=200-uniqueHeight;
+    const {uniqueHeight,duplicateHeight,duplicateTop}=dedupLayout(dedup);
     $('gallery-dedup-chart').innerHTML=svg(
       text(40,28,'待语义记录','class="svg-muted"')+text(40,66,number(dedup.source_records),'class="svg-stat"')+
       `<path d="M60 100C280 100 390 60 590 60L590 ${60+uniqueHeight}C390 ${60+uniqueHeight} 280 ${100+uniqueHeight} 60 ${100+uniqueHeight}Z" fill="#4269d0" opacity=".78"/>`+
-      `<path d="M60 ${100+uniqueHeight}C280 ${100+uniqueHeight} 390 160 590 160L590 ${160+duplicateHeight}C390 ${160+duplicateHeight} 280 300 60 300Z" fill="#bdd0f5"/>`+
-      `<rect x="40" y="100" width="20" height="200" fill="#18233a"/><rect x="590" y="60" width="13" height="${uniqueHeight}" fill="#4269d0"/><rect x="590" y="160" width="13" height="${duplicateHeight}" fill="#a4bbe9"/>`+
+      `<path d="M60 ${100+uniqueHeight}C280 ${100+uniqueHeight} 390 ${duplicateTop} 590 ${duplicateTop}L590 ${duplicateTop+duplicateHeight}C390 ${duplicateTop+duplicateHeight} 280 300 60 300Z" fill="#bdd0f5"/>`+
+      `<rect x="40" y="100" width="20" height="200" fill="#18233a"/><rect x="590" y="60" width="13" height="${uniqueHeight}" fill="#4269d0"/><rect x="590" y="${duplicateTop}" width="13" height="${duplicateHeight}" fill="#a4bbe9"/>`+
       text(350,47,number(dedup.representative_records),'class="svg-stat"')+text(350,127,'不同内容代表 · '+percent(ratio,1),'class="svg-muted"')+
       text(350,284,number(dedup.exact_duplicate_source_records),'class="svg-stat"')+text(350,329,'重复来源 · 保留全部原始位置','class="svg-muted"'),
       '来源记录精确分组：不同内容代表与重复来源，端点高度按记录比例绘制');
@@ -182,5 +187,5 @@
     }
     select(initialIndex,false,false);viewport.dataset.ready='true';win.requestAnimationFrame(tick);
   }
-  return {eventGroups,eventView,autoplayStep,loopOrder,mount};
+  return {eventGroups,eventView,autoplayStep,loopOrder,dedupLayout,mount};
 });
