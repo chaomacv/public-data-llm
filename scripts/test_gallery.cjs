@@ -228,7 +228,7 @@ test('first four stage illustrations distinguish source files, reading inputs an
  const semantic=m.render(5,d);assert.equal((semantic.match(/<li>/g)||[]).length,5);
  for(const step of ['组织输入','精确去重','本地模型提取','程序核验','逐来源回填'])assert.ok(semantic.includes(step));
  assert.ok(semantic.includes('不确定项进入复核'));
- for(let i=6;i<9;i++)assert.equal(m.render(i,d),'');
+ assert.equal(m.render(9,d),'');
 });
 
 
@@ -258,4 +258,32 @@ test('quality exclusions reconcile independently and do not rewrite historical e
  assert.match(l.stages[4].output,/1,048,465/);
  assert.match(l.stages[8].output,/1,048,465/);
  assert.ok(!/\/opt\/|"record_id"|"file_id"|"cells"/.test(JSON.stringify(c)));
+});
+
+
+test('identity, export and acceptance diagrams use reconciled result counts and preserve review scope',()=>{
+ const m=require('../showcase/run-visual.js'),d=require('../showcase/assets/run-summary.json'),l=require('../showcase/assets/data-lineage.json');
+ const c=m.resultCounts(d),f=m.auditFlow(d,l.outcomes);
+ assert.equal(c,d.final_counts);
+ assert.deepEqual(f,{total:43653625,excluded:27792348,quality:1048465,processed:14812812,review:6179034});
+ assert.equal(f.total,f.excluded+f.quality+f.processed);
+ assert.equal(Object.values(l.outcomes).reduce((a,b)=>a+b,0),f.processed);
+ const identity=m.render(6,d,l.outcomes);
+ for(const text of ['8,800,229','5,202,714','标识一致 · 无冲突','保留独立身份／复核','临时身份'])assert.ok(identity.includes(text));
+ const exports=m.render(7,d,l.outcomes);assert.equal((exports.match(/class="run-export-file"/g)||[]).length,4);
+ for(const count of ['14,812,812','5,202,714','5,968,620','6,331,400'])assert.ok(exports.includes(count));
+ const audit=m.render(8,d,l.outcomes);
+ for(const count of ['27,792,348','1,048,465','14,812,812','43,653,625','6,179,034'])assert.ok(audit.includes(count));
+ assert.ok(audit.includes('已包含在台账中'));assert.ok(audit.includes('语义准确率另行评测'));
+ assert.equal((audit.match(/data-passed="true"/g)||[]).length,3);
+ const {translate}=require('../showcase/i18n.js');
+ for(const index of [6,7,8]){
+  const text=m.render(index,d,l.outcomes).replace(/<[^>]*>/g,'\n').split('\n').map(s=>translate(s.trim())).join(' ');
+  assert.ok(!/[\u3400-\u9fff]/.test(text));
+ }
+ const bad=structuredClone(d);bad.preparation.quality_excluded_records++;assert.throws(()=>m.auditFlow(bad,l.outcomes));
+ assert.throws(()=>m.auditFlow(d,{...l.outcomes,REVIEW:l.outcomes.REVIEW+1}));
+ const badResult=structuredClone(d);badResult.final_counts.record_ledger++;assert.throws(()=>m.resultCounts(badResult));
+ const unverified=structuredClone(d);unverified.validation.exports_round_trip_validated=false;
+ assert.equal((m.render(8,unverified,l.outcomes).match(/data-passed="true"/g)||[]).length,2);
 });
