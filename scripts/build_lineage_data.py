@@ -88,7 +88,7 @@ def build(assets):
          'output': f"{n('retained')} 条处理台账 + {n('excluded')} 条相关性排除 + {n('quality')} 条质量剔除 = {n('known')} 条已知记录全部有去向。",
          'flow': ['导出回读与数量守恒通过；文件失败、结构问题及语义待复核分别保留。',
                   f"REVIEW {outcomes['REVIEW']:,} 条包含在处理台账中，不从分母再次扣除。"],
-         'files': ['audit.json', '09_review/record_review.parquet', '交付汇总/全量汇总.json']},
+         'files': ['correction.json', '05_quality/placeholder_records.parquet', '08_results/record_ledger.parquet', '09_review/record_review.parquet']},
     ]
     points = [
         ('parsed', '解析总量', 'known', '条已知逻辑记录', 1, [stages[1]['output'], '独立处理单元指工作表、文档表格或正文集合；均保留原附件关系。']),

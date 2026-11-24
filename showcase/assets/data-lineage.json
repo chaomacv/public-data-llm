@@ -259,9 +259,10 @@
         "REVIEW 6,179,034 条包含在处理台账中，不从分母再次扣除。"
       ],
       "files": [
-        "audit.json",
-        "09_review/record_review.parquet",
-        "交付汇总/全量汇总.json"
+        "correction.json",
+        "05_quality/placeholder_records.parquet",
+        "08_results/record_ledger.parquet",
+        "09_review/record_review.parquet"
       ]
     }
   ],
