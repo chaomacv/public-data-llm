@@ -516,6 +516,8 @@ test('first four processing steps explain files, cards and the screening-to-plan
  await expect(visual).toContainText('From processing units');
  for(const value of ['2,612','15,861,277','14,420,658','1,440,619'])await expect(visual).toContainText(value);
  await expect(visual).toContainText('Includes review records');
+ await expect(visual).toContainText('Complex semantic sources');expect(await visual.locator('.run-record-flow').innerText()).not.toMatch(/[\u3400-\u9fff]/);
+ expect(await page.locator('#run-step-panel>dl dt').evaluateAll(labels=>labels.every(el=>el.nextElementSibling.getBoundingClientRect().left-el.getBoundingClientRect().right>=4))).toBe(true);
  expect(await page.evaluate(()=>document.documentElement.scrollWidth)).toBeLessThanOrEqual(page.viewportSize().width+1);
  await page.locator('.run-explorer').screenshot({path:info.outputPath('pipeline-step-05-english.png')});
  await page.locator('[data-language="zh"]').click();await expect(visual).toContainText('从处理单元，到完整记录');await expect(visual).toContainText('含待复核');

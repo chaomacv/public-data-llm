@@ -88,6 +88,7 @@
   "事件层级": "Data hierarchy",
   "数据层级与数量构成": "Data hierarchy and composition",
   "文件卡片示例": "File card example",
+  "复杂语义来源": "Complex semantic sources",
   "从处理单元，到完整记录": "From processing units to complete records",
   "条记录": "records",
   "含待复核": "Includes review records",
