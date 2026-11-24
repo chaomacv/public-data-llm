@@ -5,22 +5,24 @@
   "completed_at": "2026-11-10T05:56:48.093902+08:00",
   "hash_basis": "utf8_lf_newlines",
   "source_sha256": {
-    "final-results.json": "e4c8c35e5d871f25f4809dabdeeeb7eb100dfecb7f5d9ab5b7f21649202f7035",
-    "run-summary.json": "505ff3ff8fc60c53e94bdc00ea1f51cc6a45a008688145993c6406f7952ca7d1",
-    "gallery-data.json": "050aa69a55656348f7beab76fbb6cf8d52fa0114d58db2d2c016d41929e57fd2"
+    "final-results.json": "bfd59bb387cfdba295e425af1a4f18c8a1038ac687e58b7753be5dfcbb4a0d5a",
+    "run-summary.json": "3bd02fa596868cb8133dd8ba9f45225a45ba7852581e33e83c8fbbd0ecba394b",
+    "gallery-data.json": "90e0c30516bbe6b6c5da0c2ba5fe227fed45b2635bba2727301f767d901d7ae5",
+    "quality-correction.json": "000148be7884a65aa515f351ba8fb61b4d7a70ebac26192251620af1c4a747d7"
   },
   "counts": {
     "known": 43653625,
     "excluded": 27792348,
-    "retained": 15861277,
+    "retained": 14812812,
+    "quality": 1048465,
     "mapped": 14420658,
-    "semantic": 1440619,
-    "representatives": 388349,
-    "reused": 1052270
+    "semantic": 392154,
+    "representatives": 388348,
+    "reused": 3806
   },
   "outcomes": {
     "EXTRACTED": 6300941,
-    "NO_EVENT": 3381302,
+    "NO_EVENT": 2332837,
     "REVIEW": 6179034
   },
   "equations": [
@@ -28,6 +30,7 @@
       "total": "known",
       "parts": [
         "excluded",
+        "quality",
         "retained"
       ]
     },
@@ -63,60 +66,60 @@
     {
       "id": "retained",
       "name": "保留",
-      "count": 15861277,
+      "count": 14812812,
       "count_key": "retained",
       "unit": "条保留记录",
       "step": 4,
       "details": [
-        "显式排除 27,792,348 条，保留 15,861,277 条。",
-        "43,653,625 = 27,792,348 + 15,861,277"
+        "相关性排除 27,792,348 条，质量剔除 1,048,465 条，保留 14,812,812 条。",
+        "43,653,625 = 27,792,348 + 1,048,465 + 14,812,812"
       ]
     },
     {
       "id": "semantic",
       "name": "语义来源",
-      "count": 1440619,
+      "count": 392154,
       "count_key": "semantic",
       "unit": "条复杂来源记录",
       "step": 4,
       "details": [
-        "14,420,658 条走字段方案；1,440,619 条进入逐条语义通道。",
-        "15,861,277 = 14,420,658 + 1,440,619"
+        "14,420,658 条走字段方案；392,154 条进入逐条语义通道。",
+        "14,812,812 = 14,420,658 + 392,154"
       ]
     },
     {
       "id": "representatives",
       "name": "内容代表",
-      "count": 388349,
+      "count": 388348,
       "count_key": "representatives",
       "unit": "个内容代表",
       "step": 5,
       "details": [
-        "精确分组：388,349 个代表 + 1,052,270 条重复来源。",
+        "精确分组：388,348 个代表 + 3,806 条重复来源。",
         "仅同文件、同表、完整字段和语境一致才复用；逐条核对来源后回填。"
       ]
     },
     {
       "id": "restored",
       "name": "来源回填",
-      "count": 1440619,
+      "count": 392154,
       "count_key": "semantic",
       "unit": "条复杂来源记录",
       "step": 5,
       "details": [
         "代表推理完成后，逐来源核对并回填，恢复原始来源粒度。",
-        "388,349 个推理结果服务于 1,440,619 条来源，不删除重复记录。"
+        "388,348 个推理结果服务于 392,154 条来源，不删除重复记录。"
       ]
     },
     {
       "id": "ledger",
       "name": "合并台账",
-      "count": 15861277,
+      "count": 14812812,
       "count_key": "retained",
       "unit": "条处理台账记录",
       "step": 7,
       "details": [
-        "字段方案 14,420,658 + 回填语义来源 1,440,619 = 15,861,277。",
+        "字段方案 14,420,658 + 回填语义来源 392,154 = 14,812,812。",
         "提取、无事件和待复核三类都保留独立去向。"
       ]
     },
@@ -128,7 +131,7 @@
       "unit": "条已对账的已知记录",
       "step": 8,
       "details": [
-        "15,861,277 条处理台账 + 27,792,348 条显式排除 = 43,653,625 条已知记录全部有去向。",
+        "14,812,812 条处理台账 + 27,792,348 条相关性排除 + 1,048,465 条质量剔除 = 43,653,625 条已知记录全部有去向。",
         "最终数量回到全批覆盖口径；处理台账与排除台账分别保留。"
       ]
     }
@@ -190,31 +193,33 @@
     {
       "title": "完整读取与分流",
       "input": "43,653,625 条已知逻辑记录及03–04决策",
-      "output": "排除 27,792,348；保留 15,861,277 = 字段方案 14,420,658 + 复杂语义来源 1,440,619。",
+      "output": "相关性排除 27,792,348；质量剔除 1,048,465；保留 14,812,812 = 字段方案 14,420,658 + 复杂语义来源 392,154。",
       "flow": [
-        "43,653,625 = 27,792,348 + 15,861,277",
-        "15,861,277 = 14,420,658 + 1,440,619",
-        "保留记录保存完整原值、上下文和稳定编号；排除有独立台账。"
+        "43,653,625 = 27,792,348 + 1,048,465 + 14,812,812",
+        "14,812,812 = 14,420,658 + 392,154",
+        "质量剔除仅含表头标签的占位行；来源保留，后续处理统计不再包含这些行。"
       ],
       "files": [
         "05_records/<file_id>/rows.jsonl",
-        "05_records/<file_id>/contexts.json"
+        "05_records/<file_id>/contexts.json",
+        "05_quality/placeholder_records.parquet",
+        "correction.json"
       ]
     },
     {
       "title": "抽取、复用与回填",
-      "input": "字段方案 14,420,658 条；复杂语义来源 1,440,619 条",
-      "output": "复杂来源按完整内容分成 388,349 个代表，复用 1,052,270 条来源；推理后回填到 1,440,619 条。两通道合并为 15,861,277 条台账。",
+      "input": "字段方案 14,420,658 条；复杂语义来源 392,154 条",
+      "output": "复杂来源按完整内容分成 388,348 个代表，复用 3,806 条来源；推理后回填到 392,154 条。两通道合并为 14,812,812 条台账。",
       "flow": [
-        "1,440,619 = 388,349 + 1,052,270",
+        "392,154 = 388,348 + 3,806",
         "仅同文件、同表、完整字段和语境一致才复用；逐条核对来源后回填。",
-        "388,349 是语义通道工作量，不是最终仅剩的记录数。",
-        "合并后：EXTRACTED 6,300,941／NO_EVENT 3,381,302／REVIEW 6,179,034。"
+        "388,348 是语义通道工作量，不是最终仅剩的记录数。",
+        "合并后：EXTRACTED 6,300,941／NO_EVENT 2,332,837／REVIEW 6,179,034。"
       ],
       "files": [
-        "06_validation/内容去重总表.csv",
-        "06_validation/content_indices/",
-        "06_validation/<file_id>/record_results.jsonl"
+        "correction.json",
+        "08_results/record_ledger.parquet",
+        "06_validation/content_indices/"
       ]
     },
     {
@@ -233,7 +238,7 @@
     {
       "title": "结果导出",
       "input": "逐条台账、主体关联与事件候选",
-      "output": "15,861,277 条台账／5,202,714 个画像／5,968,620 条事件观察／6,331,400 条事件来源。",
+      "output": "14,812,812 条台账／5,202,714 个画像／5,968,620 条事件观察／6,331,400 条事件来源。",
       "flow": [
         "画像、事件与来源使用不同计量单位，不能相加或画成记录持续缩减。",
         "分类修正保留原事件ID与来源，修正后的分类标签另存。"
@@ -248,15 +253,16 @@
     {
       "title": "复核与覆盖对账",
       "input": "5,200 份原附件、43,653,625 条已知逻辑记录及导出结果",
-      "output": "15,861,277 条处理台账 + 27,792,348 条显式排除 = 43,653,625 条已知记录全部有去向。",
+      "output": "14,812,812 条处理台账 + 27,792,348 条相关性排除 + 1,048,465 条质量剔除 = 43,653,625 条已知记录全部有去向。",
       "flow": [
         "导出回读与数量守恒通过；文件失败、结构问题及语义待复核分别保留。",
         "REVIEW 6,179,034 条包含在处理台账中，不从分母再次扣除。"
       ],
       "files": [
-        "audit.json",
-        "09_review/record_review.parquet",
-        "交付汇总/全量汇总.json"
+        "correction.json",
+        "05_quality/placeholder_records.parquet",
+        "08_results/record_ledger.parquet",
+        "09_review/record_review.parquet"
       ]
     }
   ],
@@ -300,7 +306,16 @@
         "completed": 388349
       }
     ],
-    "series_kind": "observed_processing_snapshots_not_business_events"
+    "series_kind": "observed_processing_snapshots_not_business_events",
+    "scope": "historical_execution_before_quality_correction",
+    "historical_representative_records": 388349
   },
-  "timing_note": "阶段图按处理顺序排列，不虚构阶段完成时刻。时间图只使用真实观测；末点为最终验收时已全部完成，并非精确推理结束时刻。"
+  "quality_correction": {
+    "version": "placeholder-quality-correction-v1",
+    "corrected_at": "2026-11-24T11:18:46.009096+00:00",
+    "reason": "header_label_only_placeholder",
+    "coverage_reconciled": true,
+    "subject_and_event_sources_affected": 0
+  },
+  "timing_note": "时间曲线为质量更正前的历史执行观测，分母388,349；更正后业务口径代表388,348，不改写历史观测。阶段图按处理顺序排列，不虚构阶段完成时刻。时间图只使用真实观测；末点为最终验收时已全部完成，并非精确推理结束时刻。"
 }

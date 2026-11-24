@@ -23,7 +23,7 @@
     "parsed_files": 8904
   },
   "counts": {
-    "record_ledger": 15861277,
+    "record_ledger": 14812812,
     "entities": 5202714,
     "entity_mentions": 8800229,
     "events": 5968620,
@@ -38,7 +38,7 @@
     },
     {
       "status": "NO_EVENT",
-      "records": 3381302
+      "records": 2332837
     },
     {
       "status": "REVIEW",
@@ -54,14 +54,15 @@
     "review": 475
   },
   "preparation": {
-    "retained_records": 15861277,
+    "retained_records": 14812812,
     "field_mapped_records": 14420658,
-    "pending_semantic_source_records": 1440619,
-    "excluded_records": 27792348
+    "pending_semantic_source_records": 392154,
+    "excluded_records": 27792348,
+    "quality_excluded_records": 1048465
   },
   "semantic_work": {
-    "representative_records": 388349,
-    "exact_duplicate_source_records": 1052270
+    "representative_records": 388348,
+    "exact_duplicate_source_records": 3806
   },
   "identity_statuses": [
     {
@@ -338,5 +339,12 @@
     "upstream_failed_downloads": 22,
     "profiles_include_provisional_identities": true,
     "current_licence_validity_verified": false
+  },
+  "quality_correction": {
+    "version": "placeholder-quality-correction-v1",
+    "corrected_at": "2026-11-24T11:18:46.009096+00:00",
+    "reason": "header_label_only_placeholder",
+    "coverage_reconciled": true,
+    "subject_and_event_sources_affected": 0
   }
 }

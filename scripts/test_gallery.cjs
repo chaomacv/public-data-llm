@@ -19,7 +19,7 @@ test('gallery aggregates reconcile separately within the completed full corpus',
   assert.ok(data.subset.events < data.subset.records);
 });
 test('public gallery exports counts and observed times without private identifiers or records', () => {
-  assert.deepEqual(Object.keys(data).sort(), ['schema_version','kind','generated_at','source_commit','final_pipeline_complete','corpus','subset','formats','file_space','events','taxonomy','record_statuses','identities','matching','dedup','progress'].sort());
+  assert.deepEqual(Object.keys(data).sort(), ['schema_version','kind','generated_at','source_commit','final_pipeline_complete','corpus','subset','formats','file_space','events','taxonomy','record_statuses','identities','matching','dedup','progress','quality_correction'].sort());
   assert.ok(!/\/opt\/|password|api_key|"cells"|"record_id"|"file_id"|"path"|10\.126\./i.test(JSON.stringify(data)));
   for (const bin of data.file_space.bins) {
     assert.deepEqual(Object.keys(bin).sort(), ['format','status','bucket','files'].sort());
@@ -147,7 +147,7 @@ test('lineage conserves every routing branch and matches its exact source export
  assert.equal(lineage.counts.retained,final.counts.record_ledger);
  assert.equal(lineage.counts.mapped,final.preparation.field_mapped_records);
  assert.equal(lineage.stages.length,9);
- assert.deepEqual(lineage.flow_points.map(p=>p.count),[43653625,15861277,1440619,388349,1440619,15861277,43653625]);
+ assert.deepEqual(lineage.flow_points.map(p=>p.count),[43653625,14812812,392154,388348,392154,14812812,43653625]);
  assert.equal(lineage.outcomes.REVIEW,6179034);
  assert.ok(!/password|10\.126\.|\/opt\/|"cells"|"record_id"/.test(JSON.stringify(lineage)));
 });
@@ -157,7 +157,7 @@ test('stage order and actual inference time remain distinct while both chart sca
  assert.ok(m.series(d,'flow').every(p=>p.at===undefined));
  assert.deepEqual(m.series(d,'time').map(p=>p.count),d.progress.points.map(p=>p.completed));
  for(const log of [true,false]){
-  const p=m.positions(d,'flow',log).points;assert.equal(p[3].count,388349);assert.equal(p[4].count,1440619);
+  const p=m.positions(d,'flow',log).points;assert.equal(p[3].count,388348);assert.equal(p[4].count,392154);
   assert.ok(p[3].y>p[4].y);assert.ok(p[0].y<p[1].y);assert.ok(p.every(n=>Number.isFinite(n.x)&&Number.isFinite(n.y)));
  }
  const p=m.positions(d,'time',false).points;
@@ -213,8 +213,28 @@ test('first four stage illustrations distinguish source files, reading inputs an
 
 test('full-reading diagram derives units and both record routes without treating review as extracted facts',()=>{
  const m=require('../showcase/run-visual.js'),d=require('../showcase/assets/run-summary.json');
- assert.deepEqual(m.readingFlow(d),{units:2612,total:15861277,field:14420658,semantic:1440619});
- const graph=m.render(4,d);for(const value of ['2,612','15,861,277','14,420,658','1,440,619','含待复核'])assert.ok(graph.includes(value));
+ assert.deepEqual(m.readingFlow(d),{units:2612,total:14812812,field:14420658,semantic:392154});
+ const graph=m.render(4,d);for(const value of ['2,612','14,812,812','14,420,658','392,154','含待复核'])assert.ok(graph.includes(value));
  assert.equal((graph.match(/class="run-record-branch"/g)||[]).length,2);
  const bad=structuredClone(d);bad.preparation.field_mapped_records++;assert.throws(()=>m.readingFlow(bad));
+});
+
+test('quality exclusions reconcile independently and do not rewrite historical execution observations',()=>{
+ const c=require('../showcase/assets/quality-correction.json'),f=require('../showcase/assets/final-results.json');
+ const l=require('../showcase/assets/data-lineage.json');
+ assert.equal(c.quality_excluded_records,1048465);
+ assert.equal(c.known_records,c.relevance_excluded_records+c.quality_excluded_records+c.record_ledger);
+ assert.equal(c.record_ledger,c.field_mapped_records+c.semantic_source_records);
+ assert.equal(c.semantic_source_records,c.representative_records+c.exact_duplicate_source_records);
+ assert.equal(c.record_statuses.NO_EVENT,2332837);
+ assert.equal(c.subject_and_event_sources_affected,0);
+ assert.equal(c.duplicate_ratio_percent,3806/392154*100);
+ assert.equal(data.progress.total,c.historical_execution.representative_records);
+ assert.equal(data.progress.scope,'historical_execution_before_quality_correction');
+ assert.equal(f.counts.record_ledger,c.record_ledger);
+ assert.equal(l.counts.quality,c.quality_excluded_records);
+ assert.equal(l.progress.points.at(-1).completed,388349);
+ assert.match(l.stages[4].output,/1,048,465/);
+ assert.match(l.stages[8].output,/1,048,465/);
+ assert.ok(!/\/opt\/|"record_id"|"file_id"|"cells"/.test(JSON.stringify(c)));
 });

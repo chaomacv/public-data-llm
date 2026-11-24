@@ -1,0 +1,34 @@
+{
+  "version": "placeholder-quality-correction-v1",
+  "corrected_at": "2026-11-24T11:18:46.009096+00:00",
+  "quality_excluded_records": 1048465,
+  "field_mapped_records": 14420658,
+  "semantic_source_records": 392154,
+  "representative_records": 388348,
+  "exact_duplicate_source_records": 3806,
+  "record_ledger": 14812812,
+  "record_statuses": {
+    "EXTRACTED": 6300941,
+    "NO_EVENT": 2332837,
+    "REVIEW": 6179034
+  },
+  "known_records": 43653625,
+  "relevance_excluded_records": 27792348,
+  "entities": 5202714,
+  "events": 5968620,
+  "event_sources": 6331400,
+  "subject_and_event_sources_affected": 0,
+  "coverage_reconciled": true,
+  "original_run_modified": false,
+  "historical_model_progress_preserved": true,
+  "reason": "header_label_only_placeholder",
+  "quality_ledger": "05_quality/placeholder_records.parquet",
+  "corrected_ledger": "08_results/record_ledger.parquet",
+  "duplicate_ratio_percent": 0.9705370849207199,
+  "historical_execution": {
+    "semantic_source_records": 1440619,
+    "representative_records": 388349,
+    "exact_duplicate_source_records": 1052270,
+    "record_ledger": 15861277
+  }
+}

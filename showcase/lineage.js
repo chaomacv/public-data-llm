@@ -9,7 +9,7 @@
   for(const value of Object.values(data.counts))if(!Number.isSafeInteger(value)||value<0)throw Error('Invalid count');
   for(const e of data.equations)if(data.counts[e.total]!==e.parts.reduce((n,k)=>n+data.counts[k],0))throw Error('Conservation failed');
   if(Object.values(data.outcomes).reduce((a,b)=>a+b,0)!==data.counts.retained)throw Error('Outcome mismatch');
-  if(data.progress.total!==data.counts.representatives)throw Error('Progress denominator mismatch');
+  if(data.progress.scope!=='historical_execution_before_quality_correction'||data.progress.total!==data.counts.representatives+1)throw Error('Historical progress scope mismatch');
   for(const p of data.flow_points)if(p.count<=0||p.count!==data.counts[p.count_key]||p.step<0||p.step>8||p.at!==undefined)throw Error('Point mismatch');
   let at=-Infinity,completed=-1;
   for(const p of data.progress.points){const time=Date.parse(p.at);if(!Number.isFinite(time)||time<=at||!Number.isSafeInteger(p.completed)||p.completed<completed||p.completed>data.progress.total)throw Error('Invalid observation');at=time;completed=p.completed;}
@@ -18,7 +18,8 @@
  function series(data,mode){
   if(mode==='flow')return data.flow_points;
   if(mode!=='time')throw Error('Invalid view');
-  return data.progress.points.map((p,i)=>({id:'observed-'+i,name:'内容代表推理进度',count:p.completed,at:p.at,unit:'个已完成内容代表',step:5,details:[
+  return data.progress.points.map((p,i)=>({id:'observed-'+i,name:'历史执行进度（质量更正前）',count:p.completed,at:p.at,unit:'个已完成内容代表',step:5,details:[
+   '历史观测分母含后来剔除的1个占位内容代表；更正后代表数为388,348。',
    `观测时已完成 ${fmt(p.completed)} / ${fmt(data.progress.total)} 个代表，剩余 ${fmt(data.progress.total-p.completed)} 个。`,
    i===data.progress.points.length-1?'本点来自最终验收汇总，说明当时已全部完成，不是精确推理结束时刻。':'这里只计内容代表的处理进度；其后仍需逐来源回填与覆盖对账。'
   ]}));
@@ -72,7 +73,7 @@
     g.addEventListener('keydown',e=>{let next;if(e.key==='ArrowRight')next=(i+1)%points.length;if(e.key==='ArrowLeft')next=(i+points.length-1)%points.length;if(e.key==='Home')next=0;if(e.key==='End')next=points.length-1;if(next!==undefined){e.preventDefault();e.stopPropagation();host.querySelector(`[data-lineage-point="${next}"]`).focus();}});
    });
    $('lineage-scrub').max=points.length-1;$('lineage-scale-label').hidden=mode==='time';
-   $('lineage-axis-note').textContent=mode==='flow'?'横轴为处理阶段顺序；各点是当前通道的工作量，回填与合并后恢复来源粒度。':'横轴为真实观测时间；折线连接观测点，不补造中间测量。末点来自最终验收汇总。';
+   $('lineage-axis-note').textContent=mode==='flow'?'横轴为处理阶段顺序；各点是当前通道的工作量，回填与合并后恢复来源粒度。':'历史执行曲线（质量更正前）：保留388,349个代表的真实观测；当前业务代表为388,348个。';
    doc.querySelectorAll('[data-lineage-mode]').forEach(b=>b.setAttribute('aria-pressed',String(b.dataset.lineageMode===mode)));
    host.dataset.mode=mode;host.dataset.pointCount=points.length;inspect(Math.min(index,points.length-1));host.dataset.ready='true';
   }

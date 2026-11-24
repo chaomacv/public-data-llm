@@ -9,23 +9,29 @@ def build(assets):
     def read(name):
         return json.loads((assets / name).read_text(encoding='utf-8'))
     final, run, gallery = [read(name) for name in ['final-results.json', 'run-summary.json', 'gallery-data.json']]
+    correction = read('quality-correction.json')
+    assert final['preparation']['quality_excluded_records'] == correction['quality_excluded_records']
+    assert final['counts']['record_ledger'] == correction['record_ledger']
+    assert correction['subject_and_event_sources_affected'] == 0 and correction['coverage_reconciled']
     if not run['validation']['final_audit_passed'] or not gallery['final_pipeline_complete']:
         raise ValueError('Completed batch required')
     c = {'known': final['input']['known_logical_records'],
          'excluded': final['preparation']['excluded_records'],
          'retained': final['preparation']['retained_records'],
+         'quality': final['preparation']['quality_excluded_records'],
          'mapped': final['preparation']['field_mapped_records'],
          'semantic': final['preparation']['pending_semantic_source_records'],
          'representatives': final['semantic_work']['representative_records'],
          'reused': final['semantic_work']['exact_duplicate_source_records']}
     outcomes = {row['status']: row['records'] for row in final['record_statuses']}
-    equations = [{'total': 'known', 'parts': ['excluded', 'retained']},
+    equations = [{'total': 'known', 'parts': ['excluded', 'quality', 'retained']},
                  {'total': 'retained', 'parts': ['mapped', 'semantic']},
                  {'total': 'semantic', 'parts': ['representatives', 'reused']}]
     for row in equations:
         assert c[row['total']] == sum(c[key] for key in row['parts'])
     assert sum(outcomes.values()) == c['retained'] == final['counts']['record_ledger']
-    assert c['representatives'] == gallery['progress']['total']
+    assert gallery['progress']['scope'] == 'historical_execution_before_quality_correction'
+    assert c['representatives'] + 1 == gallery['progress']['total']
     screening = run['screening']
     assert screening['total_units'] == run['input']['scopes']
     assert screening['total_units'] == screening['keep_units'] + screening['review_units'] + screening['excluded_units']
@@ -56,37 +62,37 @@ def build(assets):
                   '此处按业务环节归并展示；处理方式数量按单元计量，不与记录条数直接相减。'],
          'files': ['04_plans/字段方案总表.csv', '04_plans/config.json']},
         {'title': '完整读取与分流', 'input': f"{n('known')} 条已知逻辑记录及03–04决策",
-         'output': f"排除 {n('excluded')}；保留 {n('retained')} = 字段方案 {n('mapped')} + 复杂语义来源 {n('semantic')}。",
-         'flow': [f"{n('known')} = {n('excluded')} + {n('retained')}",
+         'output': f"相关性排除 {n('excluded')}；质量剔除 {n('quality')}；保留 {n('retained')} = 字段方案 {n('mapped')} + 复杂语义来源 {n('semantic')}。",
+         'flow': [f"{n('known')} = {n('excluded')} + {n('quality')} + {n('retained')}",
                   f"{n('retained')} = {n('mapped')} + {n('semantic')}",
-                  '保留记录保存完整原值、上下文和稳定编号；排除有独立台账。'],
-         'files': ['05_records/<file_id>/rows.jsonl', '05_records/<file_id>/contexts.json']},
+                  '质量剔除仅含表头标签的占位行；来源保留，后续处理统计不再包含这些行。'],
+         'files': ['05_records/<file_id>/rows.jsonl', '05_records/<file_id>/contexts.json', '05_quality/placeholder_records.parquet', 'correction.json']},
         {'title': '抽取、复用与回填', 'input': f"字段方案 {n('mapped')} 条；复杂语义来源 {n('semantic')} 条",
          'output': f"复杂来源按完整内容分成 {n('representatives')} 个代表，复用 {n('reused')} 条来源；推理后回填到 {n('semantic')} 条。两通道合并为 {n('retained')} 条台账。",
          'flow': [f"{n('semantic')} = {n('representatives')} + {n('reused')}",
                   '仅同文件、同表、完整字段和语境一致才复用；逐条核对来源后回填。',
                   f"{n('representatives')} 是语义通道工作量，不是最终仅剩的记录数。",
                   f"合并后：EXTRACTED {outcomes['EXTRACTED']:,}／NO_EVENT {outcomes['NO_EVENT']:,}／REVIEW {outcomes['REVIEW']:,}。"],
-         'files': ['06_validation/内容去重总表.csv', '06_validation/content_indices/', '06_validation/<file_id>/record_results.jsonl']},
+         'files': ['correction.json', '08_results/record_ledger.parquet', '06_validation/content_indices/']},
         {'title': '身份关联', 'input': '8,800,229 条主体提及及其来源证据',
          'output': '5,202,714 个主体画像，包含 4,364,721 个临时身份。',
          'flow': ['代码校验、名称与非空地址用于保守关联；冲突和近名保留复核。',
                   '一条记录可以含多个提及；画像数不是逻辑记录数，也不等于独立登记企业数。'],
          'files': ['07_entities/results.duckdb', '07_entities/entity_mentions.parquet']},
         {'title': '结果导出', 'input': '逐条台账、主体关联与事件候选',
-         'output': '15,861,277 条台账／5,202,714 个画像／5,968,620 条事件观察／6,331,400 条事件来源。',
+         'output': '14,812,812 条台账／5,202,714 个画像／5,968,620 条事件观察／6,331,400 条事件来源。',
          'flow': ['画像、事件与来源使用不同计量单位，不能相加或画成记录持续缩减。',
                   '分类修正保留原事件ID与来源，修正后的分类标签另存。'],
          'files': ['08_results/record_ledger.parquet', '08_results/profiles.parquet', '08_results/events.parquet', '08_results/event_sources.parquet']},
         {'title': '复核与覆盖对账', 'input': f"5,200 份原附件、{n('known')} 条已知逻辑记录及导出结果",
-         'output': f"{n('retained')} 条处理台账 + {n('excluded')} 条显式排除 = {n('known')} 条已知记录全部有去向。",
+         'output': f"{n('retained')} 条处理台账 + {n('excluded')} 条相关性排除 + {n('quality')} 条质量剔除 = {n('known')} 条已知记录全部有去向。",
          'flow': ['导出回读与数量守恒通过；文件失败、结构问题及语义待复核分别保留。',
                   f"REVIEW {outcomes['REVIEW']:,} 条包含在处理台账中，不从分母再次扣除。"],
-         'files': ['audit.json', '09_review/record_review.parquet', '交付汇总/全量汇总.json']},
+         'files': ['correction.json', '05_quality/placeholder_records.parquet', '08_results/record_ledger.parquet', '09_review/record_review.parquet']},
     ]
     points = [
         ('parsed', '解析总量', 'known', '条已知逻辑记录', 1, [stages[1]['output'], '独立处理单元指工作表、文档表格或正文集合；均保留原附件关系。']),
-        ('retained', '保留', 'retained', '条保留记录', 4, [f"显式排除 {n('excluded')} 条，保留 {n('retained')} 条。", stages[4]['flow'][0]]),
+        ('retained', '保留', 'retained', '条保留记录', 4, [f"相关性排除 {n('excluded')} 条，质量剔除 {n('quality')} 条，保留 {n('retained')} 条。", stages[4]['flow'][0]]),
         ('semantic', '语义来源', 'semantic', '条复杂来源记录', 4, [f"{n('mapped')} 条走字段方案；{n('semantic')} 条进入逐条语义通道。", stages[4]['flow'][1]]),
         ('representatives', '内容代表', 'representatives', '个内容代表', 5, [f"精确分组：{n('representatives')} 个代表 + {n('reused')} 条重复来源。", stages[5]['flow'][1]]),
         ('restored', '来源回填', 'semantic', '条复杂来源记录', 5, ['代表推理完成后，逐来源核对并回填，恢复原始来源粒度。', f"{n('representatives')} 个推理结果服务于 {n('semantic')} 条来源，不删除重复记录。"]),
@@ -97,14 +103,15 @@ def build(assets):
               'source_commit': final['source_commit'], 'completed_at': final['completed_at'],
               'hash_basis': 'utf8_lf_newlines',
               'source_sha256': {name: hashlib.sha256((assets / name).read_bytes().replace(b'\r\n', b'\n')).hexdigest()
-                                for name in ['final-results.json', 'run-summary.json', 'gallery-data.json']},
+                                for name in ['final-results.json', 'run-summary.json', 'gallery-data.json', 'quality-correction.json']},
               'counts': c, 'outcomes': outcomes, 'equations': equations,
               'flow_axis': 'processing_stage_order_not_elapsed_time',
               'flow_points': [{'id': ident, 'name': name, 'count': c[key], 'count_key': key,
                                'unit': unit, 'step': step, 'details': details}
                               for ident, name, key, unit, step, details in points],
               'stages': stages, 'progress': gallery['progress'],
-              'timing_note': '阶段图按处理顺序排列，不虚构阶段完成时刻。时间图只使用真实观测；末点为最终验收时已全部完成，并非精确推理结束时刻。'}
+              'quality_correction': final['quality_correction'],
+              'timing_note': '时间曲线为质量更正前的历史执行观测，分母388,349；更正后业务口径代表388,348，不改写历史观测。阶段图按处理顺序排列，不虚构阶段完成时刻。时间图只使用真实观测；末点为最终验收时已全部完成，并非精确推理结束时刻。'}
     (assets / 'data-lineage.json').write_text(json.dumps(result, ensure_ascii=False, indent=2) + '\n', encoding='utf-8')
     print('Exported seven lineage points, nine stages and actual progress observations.')
 

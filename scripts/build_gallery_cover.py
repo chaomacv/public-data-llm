@@ -32,7 +32,7 @@ for i,(name,n) in enumerate(events.most_common()):
  s.append(f'<text x="64" y="{y+7}" text-anchor="end" fill="#657187" font-size="7">{name}</text><rect x="72" y="{y}" width="{n/max(events.values())*177:.1f}" height="7" fill="{colors[i%len(colors)]}"/>')
 s.append('<rect x="13" y="249" width="268" height="40" fill="#f6f8fb"/><text x="22" y="265" fill="#b65b2a" font-size="8" font-family="Consolas,monospace">SELECT event_type, status, count(*)</text><text x="22" y="279" fill="#4d6788" font-size="8" font-family="Consolas,monospace">FROM classified_events GROUP BY event_type;</text></g></g>')
 s.append(card(758,'相同内容，只理解一次。','内容去重'))
-s.append('<text x="17" y="78" fill="#6b7789" font-size="11">1,440,619 条来源记录</text><path d="M25 105C110 105 150 93 251 93L251 127C150 127 110 138 25 138Z" fill="#4269d0"/><path d="M25 140C110 140 150 147 251 147L251 221C150 221 110 216 25 216Z" fill="#bdd0f5"/><text x="147" y="259" text-anchor="middle" fill="#4269d0" font-size="25">1 − U/N = 73.0%</text><text x="18" y="290" fill="#7b8799" font-size="9">比例表示重复来源，原始位置全部保留</text></g></g>')
+s.append('<text x="17" y="78" fill="#6b7789" font-size="11">392,154 条来源记录</text><path d="M25 105C110 105 150 93 251 93L251 127C150 127 110 138 25 138Z" fill="#4269d0"/><path d="M25 140C110 140 150 147 251 147L251 221C150 221 110 216 25 216Z" fill="#bdd0f5"/><text x="147" y="259" text-anchor="middle" fill="#4269d0" font-size="25">1 − U/N = 0.97%</text><text x="18" y="290" fill="#7b8799" font-size="9">比例表示重复来源，原始位置全部保留</text></g></g>')
 s.append(card(1062,'标签相近，画像相似。','画像网络'))
 network=json.loads((r/'assets/real-network.json').read_text(encoding='utf-8'))
 # Preview marks are a decorative thumbnail, not a sampled graph result.

@@ -52,7 +52,7 @@
   }
   if(index===4){
    const f=readingFlow(d);
-   return heading('从处理单元，到完整记录')+'<div class="run-record-flow"><div class="run-record-unit"><strong>'+fmt(f.units)+'</strong><span>独立处理单元</span></div><div class="run-record-connector" aria-hidden="true"></div><div class="run-record-total"><strong>'+fmt(f.total)+'</strong><span>条记录</span></div><div class="run-record-split"><div class="run-record-branch"><span>字段方案</span><strong>'+fmt(f.field)+'</strong><small>含待复核</small></div><div class="run-record-branch"><span>复杂语义来源</span><strong>'+fmt(f.semantic)+'</strong></div></div></div>';
+   return heading('从处理单元，到完整记录')+'<div class="run-record-flow"><div class="run-record-unit"><strong>'+fmt(f.units)+'</strong><span>独立处理单元</span></div><div class="run-record-connector" aria-hidden="true"></div><div class="run-record-total"><strong>'+fmt(f.total)+'</strong><span>条清洗后记录</span></div><div class="run-record-split"><div class="run-record-branch"><span>字段方案</span><strong>'+fmt(f.field)+'</strong><small>含待复核</small></div><div class="run-record-branch"><span>复杂语义来源</span><strong>'+fmt(f.semantic)+'</strong></div></div></div><p class="run-visual-caption">另有 '+fmt(d.preparation.quality_excluded_records)+' 条占位行，单列质量剔除。</p>';
   }
   if(index===5){
    const steps=[

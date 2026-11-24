@@ -88,7 +88,7 @@ def record_labels(category, stages, status):
     return category_label, detail
 
 
-def build(run, snapshot, output):
+def build(run, snapshot, output, quality_revision=None):
     import duckdb
     import xlrd
     final = read(run / '交付汇总/全量汇总.json')
@@ -144,12 +144,29 @@ def build(run, snapshot, output):
           FROM record_ledger r JOIN root_themes t USING(root_file_id)
           LEFT JOIN per_record_events e USING(record_id) GROUP BY 1,2,3,4''').fetchall()
         retained = dict(db.execute('SELECT root_file_id, count(*) FROM record_ledger GROUP BY 1').fetchall())
+        quality_counts = []
+        if quality_revision:
+            correction = read(quality_revision / 'correction.json')
+            if not correction['coverage_reconciled'] or correction['subject_and_event_sources_affected'] != 0:
+                raise ValueError('Verified quality correction required')
+            quality_counts = db.execute('SELECT root_file_id,count(*) FROM read_parquet(?) GROUP BY 1',
+                                       [str(quality_revision / '05_quality/placeholder_records.parquet')]).fetchall()
+            assert sum(n for _, n in quality_counts) == correction['quality_excluded_records']
     finally:
         db.close()
     record_counts = Counter()
     for theme, category, stages, status, count in grouped:
         label, detail = record_labels(category, stages, status)
         record_counts[(theme, label, detail)] += count
+    for root_id, count in quality_counts:
+        theme = roots[root_id]['theme']
+        key = (theme, '未提取目标事件', '未提取目标事件')
+        if record_counts[key] < count:
+            raise ValueError('Quality exclusions exceed historical no-event records')
+        record_counts[key] -= count
+        if not record_counts[key]:
+            del record_counts[key]
+        record_counts[(theme, '质量剔除', '仅含表头标签的占位行')] += count
     excluded = 0
     for root_id, total in records_per_root.items():
         count = total - retained.get(root_id, 0)
@@ -167,8 +184,8 @@ def build(run, snapshot, output):
          '按实际识别格式、官网“所属部门”和数据集归组；数量为已接收附件个数。'),
         ('logical', '可解析文件', '个', ['文件类型', '生成方式', '具体文件'],
          '仅统计成功解析且有记录的原始文件、解压成员或转换结果；每条来源处理链使用实际读取的文件，末层为匿名文件编号。'),
-        ('records', '业务记录', '条', ['业务主题', '事件类别', '细分类别'],
-         '主题来自官网目录；每条逻辑记录只计一次。细分为真实事件阶段或处理去向，多类别记录单列；包含排除和待复核记录，不等于已确认企业事实。'),
+        ('records', '解析记录', '条', ['业务主题', '事件类别', '细分类别'],
+         '解析计数包含相关性排除、质量剔除及待复核记录；占位行单列质量剔除，每条来源只计一次，不等于已确认企业事实。'),
     ]
     output.mkdir(parents=True, exist_ok=True)
     modes = []
@@ -188,6 +205,9 @@ def build(run, snapshot, output):
                          'excluded_records': excluded, 'unmatched_catalog_attachments': missing_metadata},
               'record_detail_basis': 'official_catalog_theme_then_exclusive_event_category_then_stage_or_processing_outcome',
               'source': 'completed_private_run_20261107'}
+    if quality_revision:
+        result['checks']['quality_excluded_records'] = correction['quality_excluded_records']
+        result['quality_correction'] = correction['version']
     (output / 'event-hierarchy.json').write_text(json.dumps(result, ensure_ascii=False, indent=2) + '\n', encoding='utf-8')
     print(json.dumps({'totals': expected, 'unmatched_metadata': missing_metadata, 'files': [m['file'] for m in modes]}, ensure_ascii=False))
 
@@ -197,5 +217,6 @@ if __name__ == '__main__':
     parser.add_argument('--run-dir', required=True, type=Path)
     parser.add_argument('--snapshot-dir', required=True, type=Path)
     parser.add_argument('--output-dir', required=True, type=Path)
+    parser.add_argument('--quality-correction-dir', type=Path)
     args = parser.parse_args()
-    build(args.run_dir, args.snapshot_dir, args.output_dir)
+    build(args.run_dir, args.snapshot_dir, args.output_dir, args.quality_correction_dir)

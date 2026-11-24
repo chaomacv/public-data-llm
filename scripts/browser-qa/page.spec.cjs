@@ -353,15 +353,15 @@ test('lineage routing returns to original sources while observed time remains a 
  const chart=page.locator('#gallery-timeline-chart');await expect(chart).toHaveAttribute('data-ready','true');
  await expect(chart).toHaveAttribute('data-mode','flow');await expect(page.locator('[data-lineage-point]')).toHaveCount(7);
  await page.locator('[data-lineage-point="3"]').focus();
- await expect(chart).toHaveAttribute('data-selected-count','388349');
- await expect(page.locator('#lineage-info')).toContainText('1,052,270');
+ await expect(chart).toHaveAttribute('data-selected-count','388348');
+ await expect(page.locator('#lineage-info')).toContainText('3,806');
  const representative=page.locator('[data-lineage-point="3"]');
- if(page.viewportSize().width>1100){await representative.hover();await expect(page.locator('.lineage-tooltip')).toBeVisible();await expect(page.locator('.lineage-tooltip')).toContainText('388,349');}
- await page.locator('[data-lineage-point="4"]').click();await expect(chart).toHaveAttribute('data-selected-count','1440619');
+ if(page.viewportSize().width>1100){await representative.hover();await expect(page.locator('.lineage-tooltip')).toBeVisible();await expect(page.locator('.lineage-tooltip')).toContainText('388,348');}
+ await page.locator('[data-lineage-point="4"]').click();await expect(chart).toHaveAttribute('data-selected-count','392154');
  await expect(page.locator('#lineage-info')).toContainText('回填');
  await page.locator('[data-lineage-point="4"]').focus();await page.locator('[data-lineage-point="4"]').press('ArrowRight');
- await expect(chart).toHaveAttribute('data-selected-count','15861277');
- await page.locator('#lineage-scale').selectOption('linear');await expect(chart).toHaveAttribute('data-selected-count','15861277');
+ await expect(chart).toHaveAttribute('data-selected-count','14812812');
+ await page.locator('#lineage-scale').selectOption('linear');await expect(chart).toHaveAttribute('data-selected-count','14812812');
  await page.locator('#lineage-scale').selectOption('log');await representative.click();
  await page.screenshot({path:info.outputPath('lineage-stage-flow.png')});
  await page.locator('[data-lineage-mode="time"]').click();await expect(chart).toHaveAttribute('data-mode','time');
@@ -372,7 +372,7 @@ test('lineage routing returns to original sources while observed time remains a 
  await expect(chart).toHaveAttribute('data-selected-count','42540');
  await page.locator('#lineage-scrub').press('End');
  await page.screenshot({path:info.outputPath('lineage-observed-progress.png')});
- await page.locator('[data-lineage-mode="flow"]').click();await expect(chart).toHaveAttribute('data-selected-count','388349');
+ await page.locator('[data-lineage-mode="flow"]').click();await expect(chart).toHaveAttribute('data-selected-count','388348');
 });
 
 test('nine-step lineage table and selected details expose the same conserved record quantities',async({page},info)=>{
@@ -393,16 +393,16 @@ test('nine-step lineage table and selected details expose the same conserved rec
  await expect(page.locator('#run-lineage-table tr')).toHaveCount(9);
  await expect(page.locator('#run-lineage-table tr').nth(4)).toContainText('27,792,348');
  await expect(page.locator('#run-lineage-table tr').nth(4)).toContainText('14,420,658');
- await expect(page.locator('#run-lineage-table tr').nth(5)).toContainText('388,349');
- await expect(page.locator('#run-lineage-table tr').nth(5)).toContainText('1,440,619');
+ await expect(page.locator('#run-lineage-table tr').nth(5)).toContainText('388,348');
+ await expect(page.locator('#run-lineage-table tr').nth(5)).toContainText('392,154');
  await page.locator('.run-lineage-overview').scrollIntoViewIfNeeded();
  await page.screenshot({path:info.outputPath('pipeline-lineage-table.png')});
- await page.locator('[data-flow-step="5"]').click();await expect(page.locator('#run-detail-flow')).toContainText('1,052,270');
- await expect(page.locator('#run-detail-output')).toContainText('15,861,277');
+ await page.locator('[data-flow-step="5"]').click();await expect(page.locator('#run-detail-flow')).toContainText('3,806');
+ await expect(page.locator('#run-detail-output')).toContainText('14,812,812');
  await summary.focus();await summary.press('Space');
  await expect(disclosure).not.toHaveAttribute('open','');
  await expect(page.locator('#run-lineage-table')).not.toBeVisible();
- await expect(page.locator('#run-detail-flow')).toContainText('1,052,270');
+ await expect(page.locator('#run-detail-flow')).toContainText('3,806');
  await page.locator('#run-step-panel').scrollIntoViewIfNeeded();
  await page.screenshot({path:info.outputPath('pipeline-lineage-detail.png')});
  await page.locator('[data-run-step="8"]').click();await expect(page.locator('#run-detail-output')).toContainText('43,653,625');
@@ -453,7 +453,7 @@ test('language controls preserve notebook interaction, translate new content and
  await expect(page.locator('#pipeline-title')).toHaveText('Record counts and destinations at every step');
  await page.locator('#pipeline').scrollIntoViewIfNeeded();
  await page.locator('#run-lineage-title').click();
- await expect(page.locator('#run-lineage-table')).toContainText('15,861,277');
+ await expect(page.locator('#run-lineage-table')).toContainText('14,812,812');await expect(page.locator('#run-lineage-table')).toContainText('1,048,465');
  await expect(page.locator('#run-lineage-table')).toContainText('provisional identities');
  await page.screenshot({path:info.outputPath('english-pipeline-table.png')});
  await page.locator('#evidence').scrollIntoViewIfNeeded();
@@ -514,8 +514,8 @@ test('first four processing steps explain files, cards and the screening-to-plan
  await page.locator('[data-run-step="2"]').click();await expect(page.locator('#run-detail-visual')).toContainText('The file card seen by the model');await expect(page.locator('#run-detail-visual')).toContainText('某区企业处罚公示.xlsx');expect(await page.locator('#run-detail-visual dt').evaluateAll(labels=>labels.some(el=>{const range=document.createRange();range.selectNodeContents(el);return new Set([...range.getClientRects()].map(r=>Math.round(r.top))).size>1;}))).toBe(false);await expect(visual).toContainText('From file screening');
  await page.locator('[data-run-step="4"]').click();await expect(visual).toBeVisible();await expect(page.locator('#run-detail-visual')).toBeHidden();
  await expect(visual).toContainText('From processing units');
- for(const value of ['2,612','15,861,277','14,420,658','1,440,619'])await expect(visual).toContainText(value);
- await expect(visual).toContainText('Includes review records');
+ for(const value of ['2,612','14,812,812','14,420,658','392,154'])await expect(visual).toContainText(value);
+ await expect(visual).toContainText('Includes review records');await expect(visual).toContainText('1,048,465');
  await expect(visual).toContainText('Complex semantic sources');expect(await visual.locator('.run-record-flow').innerText()).not.toMatch(/[\u3400-\u9fff]/);
  expect(await page.locator('#run-step-panel>dl dt').evaluateAll(labels=>labels.every(el=>el.nextElementSibling.getBoundingClientRect().left-el.getBoundingClientRect().right>=4))).toBe(true);
  expect(await page.evaluate(()=>document.documentElement.scrollWidth)).toBeLessThanOrEqual(page.viewportSize().width+1);

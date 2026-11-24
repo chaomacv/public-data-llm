@@ -88,12 +88,12 @@ test('public corpus snapshot contains only aggregate metadata and keeps pending 
   assert.equal(snapshot.kind, 'aggregate_run_snapshot');
   assert.equal(snapshot.semantic_accuracy_evaluated, false);
   assert.match(snapshot.source_commit, /^[a-f0-9]{40}$/);
-  assert.deepEqual(Object.keys(snapshot).sort(), ['schema_version','kind','snapshot_date','updated_at','source_commit','pipeline_status','semantic_accuracy_evaluated','input','screening','plans','preparation','semantic_work','model','validation','benchmarks','final_counts'].sort());
+  assert.deepEqual(Object.keys(snapshot).sort(), ['schema_version','kind','snapshot_date','updated_at','source_commit','pipeline_status','semantic_accuracy_evaluated','input','screening','plans','preparation','semantic_work','model','validation','benchmarks','final_counts','quality_correction'].sort());
   const {input, preparation, semantic_work, plans} = snapshot;
   for (const section of [input,preparation,semantic_work,plans]) {
     for (const value of Object.values(section)) assert.ok(Number.isSafeInteger(value) && value >= 0);
   }
-  assert.equal(input.known_logical_records, preparation.retained_records + preparation.excluded_records);
+  assert.equal(input.known_logical_records, preparation.retained_records + preparation.excluded_records + preparation.quality_excluded_records);
   assert.equal(preparation.retained_records, preparation.field_mapped_records + preparation.pending_semantic_source_records);
   assert.equal(preparation.pending_semantic_source_records, semantic_work.representative_records + semantic_work.exact_duplicate_source_records);
   assert.equal(plans.total, plans.map + plans.entity_only + plans.row_llm + plans.exclude + plans.review);
@@ -128,5 +128,5 @@ test('README languages share exact executable commands and reciprocal language n
  assert.ok(zh.includes('href="README.en.md"'));assert.ok(en.includes('href="README.md"'));
  const commands=s=>[...s.matchAll(/```bash\n([\s\S]*?)```/g)].map(m=>m[1]);
  assert.deepEqual(commands(en),commands(zh));
- for(const count of ['43,653,625','15,861,277','5,968,620','5,202,714','388,349'])assert.ok(zh.includes(count)&&en.includes(count));
+ for(const count of ['43,653,625','14,812,812','5,968,620','5,202,714','388,348'])assert.ok(zh.includes(count)&&en.includes(count));
 });

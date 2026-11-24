@@ -36,7 +36,7 @@
     },
     {
       "id": "records",
-      "label": "业务记录",
+      "label": "解析记录",
       "unit": "条",
       "levels": [
         "业务主题",
@@ -45,16 +45,18 @@
       ],
       "total": 43653625,
       "file": "sunburst-records.json",
-      "sha256": "0c52082162587ef12e6046fadb796014166c2325e5f5bb1d01bb1dd5fabcf80f",
-      "note": "主题来自官网目录；每条逻辑记录只计一次。细分为真实事件阶段或处理去向，多类别记录单列；包含排除和待复核记录，不等于已确认企业事实。"
+      "sha256": "e0e6945ce32519ecff7b4eac71599a21f959a2d8f8a3a0339a90f9dc66de182b",
+      "note": "解析计数包含相关性排除、质量剔除及待复核记录；占位行单列质量剔除，每条来源只计一次，不等于已确认企业事实。"
     }
   ],
   "checks": {
     "all_mode_totals_reconciled": true,
     "records_counted_once": true,
     "excluded_records": 27792348,
-    "unmatched_catalog_attachments": 0
+    "unmatched_catalog_attachments": 0,
+    "quality_excluded_records": 1048465
   },
   "record_detail_basis": "official_catalog_theme_then_exclusive_event_category_then_stage_or_processing_outcome",
-  "source": "completed_private_run_20261107"
+  "source": "completed_private_run_20261107",
+  "quality_correction": "placeholder-quality-correction-v1"
 }
