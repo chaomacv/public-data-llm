@@ -112,12 +112,16 @@ test('expanded notebook retains chart controls when restored',async({page},info)
   await expect(card).not.toContainText('五步处理');
   await card.locator('h3').scrollIntoViewIfNeeded();
   await page.screenshot({path:info.outputPath('field-plan-comparison.png')});
+  await page.locator('#notebook-reader-close').click();
   await page.locator('[data-language="en"]').click();
+  await page.locator('[data-notebook="5"] .notebook-reader-open').click();
   await expect(card.locator('h3')).toHaveText('Understanding heterogeneous tables and unified extraction');
   await expect(card).toContainText('97.35%');
   expect(await card.innerText()).not.toMatch(/[\u3400-\u9fff]/);
   await page.screenshot({path:info.outputPath('field-plan-comparison-english.png')});
+  await page.locator('#notebook-reader-close').click();
   await page.locator('[data-language="zh"]').click();
+  await page.locator('[data-notebook="5"] .notebook-reader-open').click();
   await page.locator('.dedup-example').scrollIntoViewIfNeeded();
   await page.screenshot({path:info.outputPath('field-plan-mapping-example.png')});
 });
