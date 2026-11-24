@@ -185,10 +185,10 @@ test('screening reconciles units kept or deferred with one field plan per contin
  for(const mutate of [x=>x.screening.excluded_units++,x=>x.screening.review_units--,x=>x.plans.total++]){
   const copy=structuredClone(d);mutate(copy);assert.throws(()=>m.validateScreening(copy));
  }
- assert.match(m.render(3,d),/13,281/);assert.match(m.render(3,d),/10,669/);assert.match(m.render(3,d),/2,612/);
+ assert.match(m.render(2,d),/13,281/);assert.match(m.render(2,d),/10,669/);assert.match(m.render(2,d),/2,612/);
  assert.deepEqual(m.screeningView(d),{total_units:13281,excluded_units:10669,continuing_units:2612,actionable_units:2137,review_units:475});
  assert.equal(d.plans.total,9551);assert.equal(d.screening.excluded_units,3730);
- assert.ok(!/3,730|9,551/.test(m.render(3,d)));
+ assert.ok(!/3,730|9,551/.test(m.render(2,d)));
  const lineage=require('../showcase/assets/data-lineage.json');
  assert.match(lineage.stages[2].output,/10,669/);assert.match(lineage.stages[2].output,/2,612/);
  assert.match(lineage.stages[3].output,/2,612/);assert.ok(!/6,939|9,551/.test(lineage.stages[3].output));
@@ -199,6 +199,10 @@ test('first four stage illustrations distinguish source files, reading inputs an
  assert.match(m.render(0,d),/CSV/);assert.match(m.render(0,d),/DOCX/);assert.match(m.render(0,d),/PDF/);assert.match(m.render(0,d),/RAR/);
  const diagram=m.render(1,d);assert.equal((diagram.match(/is-read/g)||[]).length,3);
  for(const name of ['A.csv','B.zip','C.xlsx','D.jpg','E.jsonl'])assert.ok(diagram.includes(name));
- const card=m.render(2,d);assert.match(card,/结构示例/);assert.match(card,/scope_id/);assert.match(card,/随机5/);
+ const card=m.renderDetail(2,d);assert.match(card,/结构示例/);assert.match(card,/scope_id/);assert.match(card,/随机5/);
+ const examples=m.render(3,d);assert.equal((examples.match(/data-plan-mode=/g)||[]).length,4);
+ for(const label of ['程序提取','仅主体信息','模型逐条理解','待复核','1,347','408','382','475'])assert.ok(examples.includes(label));
+ assert.match(examples,/甲公司拟获支持/);assert.match(examples,/企业？项目？/);assert.ok(!examples.includes('run-screen-track'));
+ for(let i=0;i<9;i++)if(i!==2)assert.equal(m.renderDetail(i,d),'');
  for(let i=4;i<9;i++)assert.equal(m.render(i,d),'');
 });

@@ -195,6 +195,27 @@ input[type="checkbox"] { width: 14px; height: 14px; accent-color: var(--blue); }
 .run-step-rail { min-width:0; }
 .run-step-visual { margin-top:22px; padding:18px 16px 4px; border-top:1px solid var(--line); background:linear-gradient(#fafbfc,#fff); }
 .run-step-visual[hidden] { display:none; }
+.run-detail-bottom.has-visual { display:grid; grid-template-columns:minmax(0,1fr); gap:22px; align-items:start; }
+.run-detail-artifacts { min-width:0; }
+.run-detail-visual { min-width:0; padding:17px 14px 9px; border-top:1px solid var(--line); background:linear-gradient(#fafbfc,#fff); }
+.run-detail-visual[hidden] { display:none; }
+.run-detail-visual .run-visual-heading { margin-bottom:14px; }
+.run-detail .run-card-example { grid-template-columns:max-content minmax(0,1fr); gap:5px 10px; margin:0 0 8px; font-size:13px; line-height:1.7; }
+.run-detail .run-card-example dt { white-space:nowrap; align-self:start; }
+.run-detail .run-card-example dd { line-height:1.7; }
+.run-plan-examples { display:grid; grid-template-columns:repeat(2,minmax(0,1fr)); gap:11px; padding-bottom:10px; }
+.run-plan-example { min-width:0; padding:12px 11px; border:1px solid #e2e7ef; background:#fff; }
+.run-plan-example-heading { display:flex; align-items:baseline; justify-content:space-between; flex-wrap:wrap; gap:4px 8px; margin-bottom:10px; }
+.run-plan-example-heading h4 { margin:0; font-size:13px; font-weight:550; line-height:1.7; }
+.run-plan-example-heading>span { color:#6e82a9; font:12px var(--mono); }
+.run-plan-mapping { display:grid; grid-template-columns:minmax(0,1fr) 13px minmax(0,1fr); gap:5px 3px; align-items:center; font-size:12px; line-height:1.7; }
+.run-plan-mapping i { font-style:normal; color:#8295b8; }
+.run-plan-sample { margin:0; color:#344864; font-size:13px; line-height:1.8; overflow-wrap:anywhere; }
+.run-plan-caption { margin:10px 0 0; color:var(--muted); font-size:12px; line-height:1.8; }
+.run-plan-stages { display:flex; flex-wrap:wrap; gap:5px; margin-top:7px; font-size:11px; }
+.run-plan-stages span { padding:1px 5px; background:#fff4de; color:#886227; }.run-plan-stages span+span { background:#eaf5ef; color:#24795e; }
+@media(min-width:1200px) { .run-detail-bottom.has-visual { grid-template-columns:minmax(0,.38fr) minmax(0,.62fr); gap:20px; } }
+@media(max-width:600px) { .run-plan-examples { grid-template-columns:minmax(0,1fr); }.run-detail-visual { padding-inline:10px; } }
 .run-visual-heading { display:flex; align-items:baseline; justify-content:space-between; gap:10px; margin-bottom:17px; }
 .run-visual-heading strong { font-size:14px; font-weight:550; line-height:1.7; }
 .run-visual-heading>span { flex-shrink:0; font-size:11px; color:var(--muted); }

@@ -486,14 +486,31 @@ test('first four processing steps explain files, cards and the screening-to-plan
   await expect(visual).toBeVisible();await expect(visual).toHaveAttribute('data-step',String(i));
   if(i===0)for(const type of ['CSV','DOCX','PDF','RAR'])await expect(visual).toContainText(type);
   if(i===1){await expect(visual.locator('.is-read')).toHaveCount(3);await expect(visual).toContainText('C.xlsx');await expect(visual).toContainText('E.jsonl');}
-  if(i===2){await expect(visual).toContainText('结构示例');await expect(visual).toContainText('scope_id');await expect(visual).toContainText('首3 · 中3 · 尾3 · 随机5');await expect(page.locator('#run-detail-output')).toContainText('10,669');await expect(page.locator('#run-detail-output')).toContainText('2,612');}
-  if(i===3){await expect(visual).toContainText('13,281');await expect(visual).toContainText('10,669');await expect(visual).toContainText('2,612');await expect(page.locator('#run-detail-input')).toContainText('2,612');await expect(page.locator('#run-detail-output')).toContainText('475');await expect(page.locator('#run-detail-number')).toHaveText('2,612');await expect(visual).not.toContainText('9,551');}
+  if(i===2){
+   await expect(visual).toContainText('13,281');await expect(visual).toContainText('10,669');await expect(visual).toContainText('2,612');
+   await expect(visual.locator('.run-screen-track')).toHaveCount(1);
+   const card=page.locator('#run-detail-visual');await expect(card).toBeVisible();
+   await expect(card).toContainText('结构示例');await expect(card).toContainText('scope_id');await expect(card).toContainText('首3 · 中3 · 尾3 · 随机5');
+   expect(await card.locator('dt').evaluateAll(labels=>labels.some(el=>{const range=document.createRange();range.selectNodeContents(el);return new Set([...range.getClientRects()].map(r=>Math.round(r.top))).size>1;}))).toBe(false);
+   await expect(card.locator('.run-screen-track')).toHaveCount(0);
+   await expect(page.locator('#run-detail-output')).toContainText('10,669');await expect(page.locator('#run-detail-output')).toContainText('2,612');
+   const cardBox=await card.boundingBox(),filesBox=await page.locator('.run-detail-artifacts').boundingBox();
+   if(page.viewportSize().width>=1200)expect(cardBox.x).toBeGreaterThan(filesBox.x+filesBox.width);
+   else expect(cardBox.y).toBeGreaterThan(filesBox.y+filesBox.height);
+  }
+  if(i===3){
+   await expect(visual.locator('[data-plan-mode]')).toHaveCount(4);
+   for(const label of ['程序提取','仅主体信息','模型逐条理解','待复核'])await expect(visual).toContainText(label);
+   await expect(visual).toContainText('甲公司拟获支持');await expect(visual).toContainText('企业？项目？');
+   await expect(visual.locator('.run-screen-track')).toHaveCount(0);await expect(page.locator('#run-detail-visual')).toBeHidden();
+   await expect(page.locator('#run-detail-number')).toHaveText('2,612');
+  }
   if(page.viewportSize().width>900){const side=await visual.boundingBox(),detail=await page.locator('#run-step-panel').boundingBox();expect(side.x+side.width).toBeLessThan(detail.x);}
   expect(await page.evaluate(()=>document.documentElement.scrollWidth)).toBeLessThanOrEqual(page.viewportSize().width+1);
   await page.locator('.run-explorer').screenshot({path:info.outputPath('pipeline-step-0'+(i+1)+'.png')});
  }
- await page.locator('[data-language="en"]').click();await expect(visual).toContainText('From file screening');
+ await page.locator('[data-language="en"]').click();await expect(visual).toContainText('Four processing routes');
  await expect(page.locator('#run-detail-input')).toContainText('2,612');await expect(page.locator('#run-detail-label')).toContainText('processing routes');
- await page.locator('[data-run-step="2"]').click();await expect(visual).toContainText('The file card seen by the model');await expect(visual).toContainText('某区企业处罚公示.xlsx');
- await page.locator('[data-run-step="4"]').click();await expect(visual).toBeHidden();
+ await page.locator('[data-run-step="2"]').click();await expect(page.locator('#run-detail-visual')).toContainText('The file card seen by the model');await expect(page.locator('#run-detail-visual')).toContainText('某区企业处罚公示.xlsx');expect(await page.locator('#run-detail-visual dt').evaluateAll(labels=>labels.some(el=>{const range=document.createRange();range.selectNodeContents(el);return new Set([...range.getClientRects()].map(r=>Math.round(r.top))).size>1;}))).toBe(false);await expect(visual).toContainText('From file screening');
+ await page.locator('[data-run-step="4"]').click();await expect(visual).toBeHidden();await expect(page.locator('#run-detail-visual')).toBeHidden();
 });
