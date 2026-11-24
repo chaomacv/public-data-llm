@@ -102,8 +102,31 @@ test('expanded notebook retains chart controls when restored',async({page},info)
   await expect(page.locator('.carousel-track [data-notebook]')).toHaveCount(9);
   await page.locator('[data-gallery-page="5"]').click();
   await page.locator('[data-notebook="5"] .notebook-reader-open').click();
+  const card=page.locator('[data-notebook="5"]');
+  await expect(card.locator('h3')).toHaveText('异构表格理解与统一提取');
+  await expect(page.locator('#routing-semantic-count')).toHaveText('392,154');
+  await expect(page.locator('#routing-total-count')).toHaveText('14,812,812');
+  await expect(page.locator('#routing-reduction')).toHaveText('97.35%');
+  await expect(page.locator('#gallery-dedup-chart')).toContainText('14,420,658');
+  await expect(card).toContainText('按方案保留复核');
+  await expect(card).not.toContainText('五步处理');
+  await card.locator('h3').scrollIntoViewIfNeeded();
+  await page.screenshot({path:info.outputPath('field-plan-comparison.png')});
+  await page.locator('#notebook-reader-close').click();
+  await page.locator('[data-language="en"]').click();
+  await page.locator('[data-notebook="5"] .notebook-reader-open').click();
+  await expect(card.locator('h3')).toHaveText('Understanding heterogeneous tables and unified extraction');
+  await expect(card).toContainText('97.35%');
+  expect(await card.innerText()).not.toMatch(/[\u3400-\u9fff]/);
+  await page.screenshot({path:info.outputPath('field-plan-comparison-english.png')});
+  await page.locator('.routing-example').scrollIntoViewIfNeeded();
+  expect(await page.locator('.routing-example .gallery-table').evaluate(el=>el.scrollWidth-el.clientWidth)).toBeLessThanOrEqual(1);
+  await page.screenshot({path:info.outputPath('field-plan-mapping-english.png')});
+  await page.locator('#notebook-reader-close').click();
+  await page.locator('[data-language="zh"]').click();
+  await page.locator('[data-notebook="5"] .notebook-reader-open').click();
   await page.locator('.dedup-example').scrollIntoViewIfNeeded();
-  await page.screenshot({path:info.outputPath('dedup-reuse-example.png')});
+  await page.screenshot({path:info.outputPath('field-plan-mapping-example.png')});
 });
 
 test('classification chart shows all eighteen categories and keeps profile counts explicit',async({page},info)=>{

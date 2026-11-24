@@ -775,3 +775,6 @@ html:lang(en) .lineage-phase-name { font-size:10px; }
 .design-credit { padding:15px 0 26px; text-align:center; color:#8a929e; font-size:12px; line-height:1.7; }.design-credit a { color:#5d6b80; margin-left:4px; }.design-credit a:hover { color:var(--blue); text-decoration:underline; }
 
 @media(max-width:640px) { .hero h1 { font-size:clamp(23px,7vw,32px); } }
+
+.routing-example .gallery-table { table-layout:fixed; }
+.routing-example .gallery-table :is(th,td), .routing-example .gallery-table :is(th,td):first-child { width:33.333%; white-space:normal; overflow-wrap:anywhere; vertical-align:top; }

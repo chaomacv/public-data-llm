@@ -5,14 +5,25 @@ const {eventGroups, eventView, autoplayStep, loopOrder} = require('../showcase/g
 const data = JSON.parse(fs.readFileSync(require('node:path').join(__dirname, '../showcase/assets/gallery-data.json'), 'utf8'));
 const sum = (rows, key) => rows.reduce((n, r) => n + r[key], 0);
 
-test('dedup bands remain proportional and disjoint when almost all records are unique',()=>{
- const {dedupLayout}=require('../showcase/gallery.js');
- for(const representative_records of [1,27,99]){
-  const p=dedupLayout({source_records:100,representative_records});
-  assert.equal(p.uniqueHeight/p.duplicateHeight,representative_records/(100-representative_records));
-  assert.ok(p.duplicateTop>=60+p.uniqueHeight);
-  assert.equal(p.duplicateTop+p.duplicateHeight,300);
+test('field-plan comparison uses retained sources rather than deduplicated representatives',()=>{
+ const {fieldPlanComparison,routingLayout}=require('../showcase/gallery.js');
+ const p=fieldPlanComparison(data),f=require('../showcase/assets/final-results.json');
+ assert.deepEqual(p,{total:14812812,semantic:392154,planned:14420658,reduction:14420658/14812812});
+ assert.equal(p.total,f.preparation.retained_records);
+ assert.equal(p.planned,f.preparation.field_mapped_records);
+ assert.equal(p.semantic,f.preparation.pending_semantic_source_records);
+ assert.equal((p.reduction*100).toFixed(2),'97.35');
+ for(const semantic of [1,27,99]){
+  const b=routingLayout(100,semantic);
+  assert.equal(b.semanticHeight/b.plannedHeight,semantic/(100-semantic));
+  assert.ok(b.plannedTop>=60+b.semanticHeight);
+  assert.equal(b.plannedTop+b.plannedHeight,300);
  }
+ for(const semantic of [-1,14812813,NaN])assert.throws(()=>fieldPlanComparison({...data,dedup:{source_records:semantic}}));
+ const html=fs.readFileSync(require('node:path').join(__dirname,'../showcase/index.html'),'utf8');
+ const card=html.split('data-card-key="dedup"')[1].split('data-card-key="network"')[0];
+ assert.match(card,/异构表格理解与统一提取/);assert.match(card,/含义与业务语境/);
+ assert.ok(!/内容去重与推理复用|什么样的数据，可以只理解一次|五步处理|0\.97%/.test(card));
 });
 
 test('gallery aggregates reconcile separately within the completed full corpus', () => {
