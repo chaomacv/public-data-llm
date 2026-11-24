@@ -32,6 +32,9 @@
     });
     const visual = $('run-step-visual'), illustration = window.BEIRunVisual.render(index, snapshot);
     visual.hidden = !illustration; visual.innerHTML = illustration; visual.dataset.step = String(index);
+    const detailVisual = $('run-detail-visual'), detailIllustration = window.BEIRunVisual.renderDetail(index, snapshot);
+    detailVisual.hidden = !detailIllustration; detailVisual.innerHTML = detailIllustration; detailVisual.dataset.step = String(index);
+    $('run-detail-bottom').classList.toggle('has-visual', Boolean(detailIllustration));
     $('run-step-panel').setAttribute('aria-labelledby',buttons[index].id);
     $('run-detail-state').textContent=states[state];$('run-detail-state').dataset.state=state;
     $('run-detail-title').textContent=String(index+1).padStart(2,'0')+' / '+step.title;

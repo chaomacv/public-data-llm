@@ -237,8 +237,10 @@ else:
             <div class="run-detail-heading"><h3 id="run-detail-title">06 / 抽取与核验</h3><span class="run-state" id="run-detail-state" data-state="complete">已完成</span></div>
             <div class="run-detail-metric"><strong id="run-detail-number">388,349</strong><span id="run-detail-label">个不同内容代表需语义处置</span></div>
             <dl><dt>输入</dt><dd id="run-detail-input">复杂内容代表及各自表头、语境与来源 ID</dd><dt>方法</dt><dd id="run-detail-method">完整内容精确分组后推理；按实际 tokenizer 预算拆组，再批量提交。核对主体、原文引用与记录归属，逐条回填重复来源；不确定项进入复核。</dd><dt>产出</dt><dd id="run-detail-output">逐条状态、来源引用、模型请求与原回复</dd><dt>去向</dt><dd id="run-detail-flow">1,440,619 条复杂来源 → 388,349 个代表 → 回填到原始来源。</dd></dl>
+            <div id="run-detail-bottom" class="run-detail-bottom"><div class="run-detail-artifacts">
             <div class="run-detail-files" id="run-detail-files"><code>06_validation/内容去重总表.csv</code><code>06_validation/content_indices/</code><code>06_validation/&lt;file_id&gt;/record_results.jsonl</code></div>
             <a class="text-link" id="run-detail-source" href="https://github.com/chaomacv/public-data-llm/blob/57748c4c4086432c4b129a0fee059018a1d6a4c1/src/bank_data/bulk_semantics.py" target="_blank" rel="noopener">查看本步骤源码 <span aria-hidden="true">↗</span></a>
+            </div><aside id="run-detail-visual" class="run-detail-visual" aria-label="文件卡片示例" hidden></aside></div>
           </article>
         </div>
         <p class="run-footnote">本页将两轮排除统一归入文件筛选，执行台账保留原阶段。排除、复核及来源回填均保留台账；下方交互案例明确使用合成数据。<a href="assets/run-summary.json">查看汇总 JSON ↗</a></p>
