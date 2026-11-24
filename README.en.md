@@ -16,12 +16,15 @@ The batch completed automated processing, classification refinement and final ac
 | Batch measure | Count |
 | --- | ---: |
 | Received original attachments | 5,200 |
-| Logical files | 11,701 |
+| Parsed files containing records | 8,904 |
+| Independent processing units | 13,281 |
 | Known logical records | 43,653,625 |
 | Retained records with individual outcomes | 15,861,277 |
 | Entity profiles, including provisional identities | 5,202,714 |
 | Event observations | 5,968,620 |
 | Records requiring review | 6,179,034 |
+
+**Input flow: 5,200 original attachments → 8,904 parsed files containing records → 13,281 independent processing units → relevance screening.** Parsed files include directly readable originals, extracted members and necessary conversion outputs. Processing units are worksheets, document tables or text collections.
 
 ## From 43.65 million records to 388,349 inference representatives
 

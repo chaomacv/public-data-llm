@@ -2,13 +2,16 @@ const test=require('node:test'),assert=require('node:assert/strict'),fs=require(
 const {hierarchy,layout}=require('../showcase/event-sunburst.js');
 const assets=path.join(__dirname,'../showcase/assets'),manifest=JSON.parse(fs.readFileSync(path.join(assets,'event-hierarchy.json'),'utf8'));
 test('all three real exploration modes reconcile their unit and every parent, without private fields',()=>{
- assert.equal(manifest.kind,'verified_exploration_manifest');assert.deepEqual(manifest.modes.map(m=>m.total),[5200,11701,43653625]);
+ assert.equal(manifest.kind,'verified_exploration_manifest');assert.deepEqual(manifest.modes.map(m=>m.total),[5200,8904,43653625]);
  assert.equal(manifest.checks.unmatched_catalog_attachments,0);
+ const gallery=JSON.parse(fs.readFileSync(path.join(assets,'gallery-data.json'),'utf8'));
+ assert.equal(manifest.modes.find(m=>m.id==='logical').total,gallery.corpus.parsed_files);
+ assert.equal(gallery.corpus.parsed_files,gallery.formats.filter(r=>r.status==='PROFILED').reduce((n,r)=>n+r.files,0));
  for(const mode of manifest.modes){
   const raw=fs.readFileSync(path.join(assets,mode.file)),data=JSON.parse(raw);assert.equal(crypto.createHash('sha256').update(raw).digest('hex'),mode.sha256);
   const {tree,nodes}=hierarchy(data.tree);assert.equal(tree.value,mode.total);assert.equal(Math.max(...nodes.map(n=>n.depth)),3);
   assert.ok(!/"(?:record_id|file_id|entity_id|cells|path|address|credit_code)"|\/opt\/|password/.test(raw.toString()));
-  if(mode.id==='logical'){const leaves=nodes.filter(n=>!n.children.length);assert.equal(leaves.length,11701);assert.ok(leaves.every(n=>n.value===1&&/^逻辑文件 \d{5}$/.test(n.name)));}
+  if(mode.id==='logical'){const leaves=nodes.filter(n=>!n.children.length);assert.equal(leaves.length,8904);assert.ok(leaves.every(n=>n.value===1&&/^可解析文件 \d{5}$/.test(n.name)));}
   if(mode.id==='records')assert.equal(nodes.filter(n=>n.depth===2&&n.name==='已筛选排除').reduce((s,n)=>s+n.value,0),27792348);
  }
 });

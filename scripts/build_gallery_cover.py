@@ -12,16 +12,17 @@ s.append(card(-156,'执行进度快照','执行进度'))
 pts=d['progress']['points'];lo=min(x['completed'] for x in pts);hi=max(x['completed'] for x in pts)
 p=' '.join(('M' if i==0 else 'L')+f'{20+i*36:.1f} {240-(v["completed"]-lo)/(hi-lo)*160:.1f}' for i,v in enumerate(pts))
 s.append(f'<path d="{p}" fill="none" stroke="#4269d0" stroke-width="3"/></g></g>')
-s.append(card(150,'展开后的文件是什么样？','文件概览'))
+s.append(card(150,'可解析文件格式构成','文件概览'))
 counts=Counter()
-for v in d['formats']:counts[v['format']]+=v['files']
+for v in d['formats']:
+ if v['status']=='PROFILED':counts[v['format']]+=v['files']
 a=-math.pi/2
 for i,(name,n) in enumerate(counts.most_common()):
- b=a+n/d['corpus']['logical_files']*math.pi*2
+ b=a+n/d['corpus']['parsed_files']*math.pi*2
  def pt(rad,angle):return f'{147+rad*math.cos(angle):.2f} {160+rad*math.sin(angle):.2f}'
  path=f'M{pt(102,a)}A102 102 0 {int(b-a>math.pi)} 1 {pt(102,b)}L{pt(52,b)}A52 52 0 {int(b-a>math.pi)} 0 {pt(52,a)}Z'
  s.append(f'<path d="{path}" fill="{colors[i%len(colors)]}" stroke="white"/>');a=b
-s.append('<text x="147" y="163" text-anchor="middle" fill="#263247" font-size="19">11,701</text><text x="147" y="181" text-anchor="middle" fill="#7b8799" font-size="9">逻辑文件</text><text x="16" y="290" fill="#7b8799" font-size="9">格式 × 解析状态 / 全批元数据</text></g></g>')
+s.append('<text x="147" y="163" text-anchor="middle" fill="#263247" font-size="19">8,904</text><text x="147" y="181" text-anchor="middle" fill="#7b8799" font-size="9">可解析文件</text><text x="16" y="290" fill="#7b8799" font-size="9">格式构成 / 成功解析且有记录</text></g></g>')
 s.append(card(454,'全部事件分类 · 18 类','事件分类'))
 events=Counter()
 for v in d['events']:

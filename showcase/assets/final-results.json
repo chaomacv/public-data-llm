@@ -19,7 +19,8 @@
     "known_logical_records": 43653625,
     "upstream_failed_downloads": 22,
     "pages_without_recognized_attachments": 4,
-    "unreadable_logical_files": 65
+    "unreadable_logical_files": 65,
+    "parsed_files": 8904
   },
   "counts": {
     "record_ledger": 15861277,
