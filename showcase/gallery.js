@@ -17,9 +17,15 @@
   const text = (x,y,s,attrs='') => `<text x="${x}" y="${y}" ${attrs}>${esc(s)}</text>`;
   const svg = (body, label, width=720, height=340) => `<svg viewBox="0 0 ${width} ${height}" role="img" aria-label="${esc(label)}"><title>${esc(label)}</title>${body}</svg>`;
 
-  function dedupLayout(d) {
-    const uniqueHeight=200*d.representative_records/d.source_records;
-    return {uniqueHeight,duplicateHeight:200-uniqueHeight,duplicateTop:100+uniqueHeight};
+  function fieldPlanComparison(data) {
+    const total=data.subset.records,semantic=data.dedup.source_records;
+    if(![total,semantic].every(Number.isSafeInteger)||total<=0||semantic<0||semantic>total)throw Error('Invalid field-plan comparison');
+    const planned=total-semantic;
+    return {total,semantic,planned,reduction:planned/total};
+  }
+  function routingLayout(total,semantic) {
+    const semanticHeight=200*semantic/total;
+    return {semanticHeight,plannedHeight:200-semanticHeight,plannedTop:100+semanticHeight};
   }
 
   function eventGroups(rows, state='all') {
@@ -87,16 +93,18 @@
     $('gallery-taxonomy-categories').textContent=eventGroups(data.events).length;
     renderEvents();
 
-    const dedup=data.dedup, ratio=dedup.representative_records/dedup.source_records;
-    const {uniqueHeight,duplicateHeight,duplicateTop}=dedupLayout(dedup);
+    const comparison=fieldPlanComparison(data),{total,semantic,planned}=comparison;
+    const {semanticHeight,plannedHeight,plannedTop}=routingLayout(total,semantic);
     $('gallery-dedup-chart').innerHTML=svg(
-      text(40,28,'待语义记录','class="svg-muted"')+text(40,66,number(dedup.source_records),'class="svg-stat"')+
-      `<path d="M60 100C280 100 390 60 590 60L590 ${60+uniqueHeight}C390 ${60+uniqueHeight} 280 ${100+uniqueHeight} 60 ${100+uniqueHeight}Z" fill="#4269d0" opacity=".78"/>`+
-      `<path d="M60 ${100+uniqueHeight}C280 ${100+uniqueHeight} 390 ${duplicateTop} 590 ${duplicateTop}L590 ${duplicateTop+duplicateHeight}C390 ${duplicateTop+duplicateHeight} 280 300 60 300Z" fill="#bdd0f5"/>`+
-      `<rect x="40" y="100" width="20" height="200" fill="#18233a"/><rect x="590" y="60" width="13" height="${uniqueHeight}" fill="#4269d0"/><rect x="590" y="${duplicateTop}" width="13" height="${duplicateHeight}" fill="#a4bbe9"/>`+
-      text(350,47,number(dedup.representative_records),'class="svg-stat"')+text(350,127,'不同内容代表 · '+percent(ratio,1),'class="svg-muted"')+
-      text(350,284,number(dedup.exact_duplicate_source_records),'class="svg-stat"')+text(350,329,'重复来源 · 保留全部原始位置','class="svg-muted"'),
-      '来源记录精确分组：不同内容代表与重复来源，端点高度按记录比例绘制');
+      text(40,28,'全部逐条交给LLM','class="svg-muted"')+text(40,66,number(total),'class="svg-stat"')+
+      `<path d="M60 100C280 100 390 60 590 60L590 ${60+semanticHeight}C390 ${60+semanticHeight} 280 ${100+semanticHeight} 60 ${100+semanticHeight}Z" fill="#4269d0" opacity=".78"/>`+
+      `<path d="M60 ${100+semanticHeight}C280 ${100+semanticHeight} 390 ${plannedTop} 590 ${plannedTop}L590 ${plannedTop+plannedHeight}C390 ${plannedTop+plannedHeight} 280 300 60 300Z" fill="#bdd0f5"/>`+
+      `<rect x="40" y="100" width="20" height="200" fill="#18233a"/><rect x="590" y="60" width="13" height="${semanticHeight}" fill="#4269d0"/><rect x="590" y="${plannedTop}" width="13" height="${plannedHeight}" fill="#a4bbe9"/>`+
+      text(350,47,number(semantic),'class="svg-stat"')+text(350,88,'逐条语义处理 · '+(semantic/total*100).toFixed(2)+'%','class="svg-muted"')+
+      text(350,284,number(planned),'class="svg-stat"')+text(350,329,'字段方案分流 · 含待复核','class="svg-muted"'),
+      '同一批保留记录：逐条语义处理与字段方案分流，色带宽度按记录数量绘制');
+    $('routing-semantic-count').textContent=number(semantic);$('routing-total-count').textContent=number(total);
+    $('routing-reduction').textContent=(comparison.reduction*100).toFixed(2)+'%';
 
     // A real clock drives the pager. Reading, hidden tabs and reduced motion pause it.
     const viewport=$('gallery-viewport'), track=viewport.querySelector('.carousel-track');
@@ -187,5 +195,5 @@
     }
     select(initialIndex,false,false);viewport.dataset.ready='true';win.requestAnimationFrame(tick);
   }
-  return {eventGroups,eventView,autoplayStep,loopOrder,dedupLayout,mount};
+  return {eventGroups,eventView,autoplayStep,loopOrder,fieldPlanComparison,routingLayout,mount};
 });
