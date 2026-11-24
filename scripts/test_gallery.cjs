@@ -185,7 +185,13 @@ test('screening reconciles units kept or deferred with one field plan per contin
  for(const mutate of [x=>x.screening.excluded_units++,x=>x.screening.review_units--,x=>x.plans.total++]){
   const copy=structuredClone(d);mutate(copy);assert.throws(()=>m.validateScreening(copy));
  }
- assert.match(m.render(3,d),/13,281/);assert.match(m.render(3,d),/3,730/);assert.match(m.render(3,d),/9,551/);
+ assert.match(m.render(3,d),/13,281/);assert.match(m.render(3,d),/10,669/);assert.match(m.render(3,d),/2,612/);
+ assert.deepEqual(m.screeningView(d),{total_units:13281,excluded_units:10669,continuing_units:2612,actionable_units:2137,review_units:475});
+ assert.equal(d.plans.total,9551);assert.equal(d.screening.excluded_units,3730);
+ assert.ok(!/3,730|9,551/.test(m.render(3,d)));
+ const lineage=require('../showcase/assets/data-lineage.json');
+ assert.match(lineage.stages[2].output,/10,669/);assert.match(lineage.stages[2].output,/2,612/);
+ assert.match(lineage.stages[3].output,/2,612/);assert.ok(!/6,939|9,551/.test(lineage.stages[3].output));
 });
 
 test('first four stage illustrations distinguish source files, reading inputs and synthetic file cards',()=>{

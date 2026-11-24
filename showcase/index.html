@@ -224,7 +224,7 @@ else:
             <button id="run-tab-01" type="button" role="tab" aria-selected="false" aria-controls="run-step-panel" tabindex="-1" data-run-step="0" data-state="complete"><span>01</span><strong>固定输入</strong><small class="run-step-status">已完成</small></button>
             <button id="run-tab-02" type="button" role="tab" aria-selected="false" aria-controls="run-step-panel" tabindex="-1" data-run-step="1" data-state="complete"><span>02</span><strong>解析与抽样</strong><small class="run-step-status">已完成</small></button>
             <button id="run-tab-03" type="button" role="tab" aria-selected="false" aria-controls="run-step-panel" tabindex="-1" data-run-step="2" data-state="complete"><span>03</span><strong>文件筛选</strong><small class="run-step-status">已完成</small></button>
-            <button id="run-tab-04" type="button" role="tab" aria-selected="false" aria-controls="run-step-panel" tabindex="-1" data-run-step="3" data-state="complete"><span>04</span><strong>字段方案</strong><small class="run-step-status">已完成</small></button>
+            <button id="run-tab-04" type="button" role="tab" aria-selected="false" aria-controls="run-step-panel" tabindex="-1" data-run-step="3" data-state="complete"><span>04</span><strong>处理方案</strong><small class="run-step-status">已完成</small></button>
             <button id="run-tab-05" type="button" role="tab" aria-selected="false" aria-controls="run-step-panel" tabindex="-1" data-run-step="4" data-state="complete"><span>05</span><strong>完整读取</strong><small class="run-step-status">已完成</small></button>
             <button id="run-tab-06" type="button" role="tab" aria-selected="true" aria-controls="run-step-panel" data-run-step="5" data-state="complete"><span>06</span><strong>抽取与核验</strong><small class="run-step-status">已完成</small></button>
             <button id="run-tab-07" type="button" role="tab" aria-selected="false" aria-controls="run-step-panel" tabindex="-1" data-run-step="6" data-state="complete"><span>07</span><strong>身份关联</strong><small class="run-step-status">已完成</small></button>
@@ -241,7 +241,7 @@ else:
             <a class="text-link" id="run-detail-source" href="https://github.com/chaomacv/public-data-llm/blob/57748c4c4086432c4b129a0fee059018a1d6a4c1/src/bank_data/bulk_semantics.py" target="_blank" rel="noopener">查看本步骤源码 <span aria-hidden="true">↗</span></a>
           </article>
         </div>
-        <p class="run-footnote">本页为已完成批次的数量与去向。排除、复核及来源回填均保留台账；下方交互案例明确使用合成数据。<a href="assets/run-summary.json">查看汇总 JSON ↗</a></p>
+        <p class="run-footnote">本页将两轮排除统一归入文件筛选，执行台账保留原阶段。排除、复核及来源回填均保留台账；下方交互案例明确使用合成数据。<a href="assets/run-summary.json">查看汇总 JSON ↗</a></p>
       </div>
       <div class="architecture-bottom"><div><span class="bracket">[ LOCAL ]</span><p>本地 Qwen3-8B · 原始 BF16 权重。模型理解文件、生成字段方案并处理复杂内容，程序逐行复制和校验原值。</p></div><div><span class="bracket">[ TRACEABLE ]</span><p>大表采用流式 JSONL 与 DuckDB 聚合，Parquet 保存明细。CSV 用于导航，事件可追溯到记录、单元格与原附件。</p></div><div><span class="bracket">[ RESUMABLE ]</span><p>内容与配置签名控制续跑。有效检查点保留，失败、排除与复核分别记账；新方案留下独立版本与核验回执。</p></div></div>
     </section>
