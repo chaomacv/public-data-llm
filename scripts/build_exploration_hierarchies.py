@@ -61,6 +61,22 @@ def tree_from_counts(name, counts):
     return node(name, branches)
 
 
+def parsed_file_counts(profiles):
+    """Count only successful, nonempty content inputs; omit replaced originals."""
+    counts = Counter()
+    selected = sorted((p for p in profiles if p.get('status') == 'PROFILED'), key=lambda p: p['file_id'])
+    for i, p in enumerate(selected, 1):
+        if not p.get('cards') or int(p.get('records') or 0) <= 0:
+            raise ValueError('Profiled file must have records and processing units')
+        source = p.get('source') or {}
+        method = {'native_document_or_ocr_text': '正文提取／OCR', 'xml_xpath_fields': 'XML 表格展开',
+                  'gdal_filegdb_attributes': '地理库属性提取'}.get(source.get('source_kind'))
+        if not method:
+            method = '原始附件' if p['file_id'] == (p.get('root_file_id') or p['file_id']) else '压缩包展开／派生文件'
+        counts[(str(p.get('kind') or '未知类型').upper(), method, f'可解析文件 {i:05d}')] = 1
+    return counts
+
+
 def record_labels(category, stages, status):
     if not category:
         return ('待复核记录', '保留复核') if status == 'REVIEW' else ('未提取目标事件', '未提取目标事件')
@@ -101,14 +117,7 @@ def build(run, snapshot, output):
             meta = {'department': '官网部门未匹配', 'dataset': '官网数据集未匹配', 'theme': '官网主题未匹配'}
         roots[item['file_id']] = meta
         original_counts[(str(item.get('kind') or '未知格式').upper(), meta['department'], meta['dataset'])] += 1
-    for i, p in enumerate(sorted(profiles, key=lambda x: x['file_id']), 1):
-        source = p.get('source') or {}
-        kind = source.get('source_kind')
-        method = {'native_document_or_ocr_text': '正文提取／OCR', 'xml_xpath_fields': 'XML 表格展开',
-                  'gdal_filegdb_attributes': '地理库属性提取'}.get(kind)
-        if not method:
-            method = '原始附件' if p['file_id'] == (p.get('root_file_id') or p['file_id']) else '压缩包展开／派生文件'
-        logical_counts[(str(p.get('kind') or '未知类型').upper(), method, f'逻辑文件 {i:05d}')] = 1
+    logical_counts = parsed_file_counts(profiles)
     records_per_root = Counter()
     for p in profiles:
         records_per_root[p.get('root_file_id') or p['file_id']] += int(p.get('records') or 0)
@@ -149,15 +158,15 @@ def build(run, snapshot, output):
         if count:
             record_counts[(roots[root_id]['theme'], '已筛选排除', '筛选或字段方案明确排除')] += count
             excluded += count
-    expected = [final['downloaded_attachments'], final['native']['logical_files'], final['audit']['known_logical_records']]
+    expected = [final['downloaded_attachments'], len([p for p in profiles if p.get('status') == 'PROFILED']), final['audit']['known_logical_records']]
     counts_list = [original_counts, logical_counts, record_counts]
     if [sum(x.values()) for x in counts_list] != expected or excluded != final['preparation']['excluded_records']:
         raise ValueError('Hierarchy counts do not match final audit')
     definitions = [
         ('attachments', '原始附件', '份', ['文件格式', '来源部门', '数据集'],
          '按实际识别格式、官网“所属部门”和数据集归组；数量为已接收附件个数。'),
-        ('logical', '逻辑文件', '个', ['文件类型', '生成方式', '具体文件'],
-         '包含原始附件、展开成员与转换结果；末层为一一对应的匿名文件编号，不公开原文件名或路径。'),
+        ('logical', '可解析文件', '个', ['文件类型', '生成方式', '具体文件'],
+         '仅统计成功解析且有记录的原始文件、解压成员或转换结果；每条来源处理链使用实际读取的文件，末层为匿名文件编号。'),
         ('records', '业务记录', '条', ['业务主题', '事件类别', '细分类别'],
          '主题来自官网目录；每条逻辑记录只计一次。细分为真实事件阶段或处理去向，多类别记录单列；包含排除和待复核记录，不等于已确认企业事实。'),
     ]

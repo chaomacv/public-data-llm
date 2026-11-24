@@ -179,7 +179,7 @@ test('three real sunburst modes retain full totals and support true two-level zo
  await page.screenshot({path:info.outputPath('whole-sunburst-card.png')});
  await page.locator('[data-notebook="3"] .notebook-reader-open').click();
  await wholeChartFits();
- for(const [mode,total] of [['attachments','5200'],['logical','11701'],['records','43653625']]){
+ for(const [mode,total] of [['attachments','5200'],['logical','8904'],['records','43653625']]){
   await page.locator(`[data-sun-mode="${mode}"]`).click();
   const chart=page.locator('#event-sunburst-chart');await expect(chart).toHaveAttribute('data-mode',mode);
   await expect(chart).toHaveAttribute('data-focus-count',total);
