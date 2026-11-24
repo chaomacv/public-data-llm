@@ -76,5 +76,12 @@
     "event_sources": 6331400,
     "name_ambiguities": 454027,
     "name_neighbors": 300226
+  },
+  "screening": {
+    "total_units": 13281,
+    "keep_units": 9243,
+    "review_units": 308,
+    "excluded_units": 3730,
+    "planned_units": 9551
   }
 }
