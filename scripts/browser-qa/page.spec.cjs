@@ -522,5 +522,13 @@ test('first four processing steps explain files, cards and the screening-to-plan
  await page.locator('.run-explorer').screenshot({path:info.outputPath('pipeline-step-05-english.png')});
  await page.locator('[data-language="zh"]').click();await expect(visual).toContainText('从处理单元，到完整记录');await expect(visual).toContainText('含待复核');
  await page.locator('.run-explorer').screenshot({path:info.outputPath('pipeline-step-05.png')});
- await page.locator('[data-run-step="5"]').click();await expect(visual).toBeHidden();
+ await page.locator('[data-run-step="5"]').click();await expect(visual).toBeVisible();await expect(visual).toHaveAttribute('data-step','5');
+ await expect(visual.locator('.run-semantic-steps li')).toHaveCount(5);await expect(page.locator('#run-detail-visual')).toBeHidden();
+ for(const step of ['组织输入','精确去重','本地模型提取','程序核验','逐来源回填'])await expect(visual).toContainText(step);
+ await expect(visual).toContainText('不确定项进入复核');
+ await page.locator('.run-explorer').screenshot({path:info.outputPath('pipeline-step-06.png')});
+ await page.locator('[data-language="en"]').click();await expect(visual).toContainText('Complex semantic data in five steps');expect(await visual.innerText()).not.toMatch(/[\u3400-\u9fff]/);
+ expect(await page.evaluate(()=>document.documentElement.scrollWidth)).toBeLessThanOrEqual(page.viewportSize().width+1);
+ await page.locator('.run-explorer').screenshot({path:info.outputPath('pipeline-step-06-english.png')});
+ await page.locator('[data-run-step="6"]').click();await expect(visual).toBeHidden();
 });
