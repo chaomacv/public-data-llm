@@ -195,6 +195,14 @@ input[type="checkbox"] { width: 14px; height: 14px; accent-color: var(--blue); }
 .run-step-rail { min-width:0; }
 .run-step-visual { margin-top:22px; padding:18px 16px 4px; border-top:1px solid var(--line); background:linear-gradient(#fafbfc,#fff); }
 .run-step-visual[hidden] { display:none; }
+.run-semantic-steps { margin:0; padding:0; list-style:none; }
+.run-semantic-steps li { position:relative; display:grid; grid-template-columns:23px minmax(0,1fr); gap:12px; padding:0 0 15px; }
+.run-semantic-steps li:not(:last-child):before { content:""; position:absolute; left:10px; top:24px; bottom:2px; width:1px; background:#d9e2f2; }
+.run-semantic-number { display:flex; align-items:center; justify-content:center; width:22px; height:22px; border:1px solid #d9e3f5; border-radius:50%; background:#f0f4fc; color:#5373b4; font:11px var(--mono); }
+.run-semantic-steps li>div { min-width:0; }
+.run-semantic-steps strong { display:block; font-size:14px; font-weight:550; line-height:1.6; }
+.run-semantic-steps li>div>span { display:block; margin-top:3px; font-size:12px; color:var(--muted); line-height:1.7; overflow-wrap:anywhere; }
+.run-semantic-review { margin:0 0 9px 35px; padding-left:9px; border-left:2px solid #dcb77b; color:#8b6d3e; font-size:12px; line-height:1.7; }
 :lang(en) .run-detail>dl { grid-template-columns:max-content minmax(0,1fr); }
 .run-record-flow { padding:2px 0 13px; }
 .run-record-unit { display:flex; align-items:baseline; justify-content:center; flex-wrap:wrap; gap:6px 10px; padding:10px; border:1px solid #e0e6ef; background:#fff; }

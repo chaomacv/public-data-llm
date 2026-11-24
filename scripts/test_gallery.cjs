@@ -204,7 +204,10 @@ test('first four stage illustrations distinguish source files, reading inputs an
  for(const label of ['程序提取','仅主体信息','模型逐条理解','待复核','1,347','408','382','475'])assert.ok(examples.includes(label));
  assert.match(examples,/甲公司拟获支持/);assert.match(examples,/企业？项目？/);assert.ok(!examples.includes('run-screen-track'));
  for(let i=0;i<9;i++)if(i!==2)assert.equal(m.renderDetail(i,d),'');
- for(let i=5;i<9;i++)assert.equal(m.render(i,d),'');
+ const semantic=m.render(5,d);assert.equal((semantic.match(/<li>/g)||[]).length,5);
+ for(const step of ['组织输入','精确去重','本地模型提取','程序核验','逐来源回填'])assert.ok(semantic.includes(step));
+ assert.ok(semantic.includes('不确定项进入复核'));
+ for(let i=6;i<9;i++)assert.equal(m.render(i,d),'');
 });
 
 

@@ -54,6 +54,16 @@
    const f=readingFlow(d);
    return heading('从处理单元，到完整记录')+'<div class="run-record-flow"><div class="run-record-unit"><strong>'+fmt(f.units)+'</strong><span>独立处理单元</span></div><div class="run-record-connector" aria-hidden="true"></div><div class="run-record-total"><strong>'+fmt(f.total)+'</strong><span>条记录</span></div><div class="run-record-split"><div class="run-record-branch"><span>字段方案</span><strong>'+fmt(f.field)+'</strong><small>含待复核</small></div><div class="run-record-branch"><span>复杂语义来源</span><strong>'+fmt(f.semantic)+'</strong></div></div></div>';
   }
+  if(index===5){
+   const steps=[
+    ['组织输入','表头 · 语境 · 来源编号'],
+    ['精确去重','同表原值与语境完全一致才复用'],
+    ['本地模型提取','主体 · 事件 · 阶段 · 证据'],
+    ['程序核验','结构 · 原文引用 · 来源归属'],
+    ['逐来源回填','保留每条记录与来源位置']
+   ];
+   return heading('复杂语义数据，五步处理')+'<ol class="run-semantic-steps" aria-label="复杂语义处理步骤">'+steps.map(([title,caption],i)=>'<li><span class="run-semantic-number" aria-hidden="true">'+(i+1)+'</span><div><strong>'+title+'</strong><span>'+caption+'</span></div></li>').join('')+'</ol><p class="run-semantic-review">不确定项进入复核</p>';
+  }
   return '';
  }
  function renderScreening(d){
