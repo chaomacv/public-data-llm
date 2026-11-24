@@ -119,6 +119,9 @@ test('expanded notebook retains chart controls when restored',async({page},info)
   await expect(card).toContainText('97.35%');
   expect(await card.innerText()).not.toMatch(/[\u3400-\u9fff]/);
   await page.screenshot({path:info.outputPath('field-plan-comparison-english.png')});
+  await page.locator('.routing-example').scrollIntoViewIfNeeded();
+  expect(await page.locator('.routing-example .gallery-table').evaluate(el=>el.scrollWidth-el.clientWidth)).toBeLessThanOrEqual(1);
+  await page.screenshot({path:info.outputPath('field-plan-mapping-english.png')});
   await page.locator('#notebook-reader-close').click();
   await page.locator('[data-language="zh"]').click();
   await page.locator('[data-notebook="5"] .notebook-reader-open').click();
