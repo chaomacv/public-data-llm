@@ -491,7 +491,7 @@ test('first four processing steps explain files, cards and the screening-to-plan
    await expect(visual.locator('.run-screen-track')).toHaveCount(1);
    const card=page.locator('#run-detail-visual');await expect(card).toBeVisible();
    await expect(card).toContainText('结构示例');await expect(card).toContainText('scope_id');await expect(card).toContainText('首3 · 中3 · 尾3 · 随机5');
-   expect(await card.locator('dt').evaluateAll(labels=>labels.some(el=>el.getBoundingClientRect().height>parseFloat(getComputedStyle(el).lineHeight)+1))).toBe(false);
+   expect(await card.locator('dt').evaluateAll(labels=>labels.some(el=>{const range=document.createRange();range.selectNodeContents(el);return new Set([...range.getClientRects()].map(r=>Math.round(r.top))).size>1;}))).toBe(false);
    await expect(card.locator('.run-screen-track')).toHaveCount(0);
    await expect(page.locator('#run-detail-output')).toContainText('10,669');await expect(page.locator('#run-detail-output')).toContainText('2,612');
    const cardBox=await card.boundingBox(),filesBox=await page.locator('.run-detail-artifacts').boundingBox();
@@ -511,6 +511,6 @@ test('first four processing steps explain files, cards and the screening-to-plan
  }
  await page.locator('[data-language="en"]').click();await expect(visual).toContainText('Four processing routes');
  await expect(page.locator('#run-detail-input')).toContainText('2,612');await expect(page.locator('#run-detail-label')).toContainText('processing routes');
- await page.locator('[data-run-step="2"]').click();await expect(page.locator('#run-detail-visual')).toContainText('The file card seen by the model');await expect(page.locator('#run-detail-visual')).toContainText('某区企业处罚公示.xlsx');expect(await page.locator('#run-detail-visual dt').evaluateAll(labels=>labels.some(el=>el.getBoundingClientRect().height>parseFloat(getComputedStyle(el).lineHeight)+1))).toBe(false);await expect(visual).toContainText('From file screening');
+ await page.locator('[data-run-step="2"]').click();await expect(page.locator('#run-detail-visual')).toContainText('The file card seen by the model');await expect(page.locator('#run-detail-visual')).toContainText('某区企业处罚公示.xlsx');expect(await page.locator('#run-detail-visual dt').evaluateAll(labels=>labels.some(el=>{const range=document.createRange();range.selectNodeContents(el);return new Set([...range.getClientRects()].map(r=>Math.round(r.top))).size>1;}))).toBe(false);await expect(visual).toContainText('From file screening');
  await page.locator('[data-run-step="4"]').click();await expect(visual).toBeHidden();await expect(page.locator('#run-detail-visual')).toBeHidden();
 });

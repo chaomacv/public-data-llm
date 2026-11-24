@@ -201,7 +201,7 @@ input[type="checkbox"] { width: 14px; height: 14px; accent-color: var(--blue); }
 .run-detail-visual[hidden] { display:none; }
 .run-detail-visual .run-visual-heading { margin-bottom:14px; }
 .run-detail .run-card-example { grid-template-columns:max-content minmax(0,1fr); gap:5px 10px; margin:0 0 8px; font-size:13px; line-height:1.7; }
-.run-detail .run-card-example dt { white-space:nowrap; }
+.run-detail .run-card-example dt { white-space:nowrap; align-self:start; }
 .run-detail .run-card-example dd { line-height:1.7; }
 .run-plan-examples { display:grid; grid-template-columns:repeat(2,minmax(0,1fr)); gap:11px; padding-bottom:10px; }
 .run-plan-example { min-width:0; padding:12px 11px; border:1px solid #e2e7ef; background:#fff; }
