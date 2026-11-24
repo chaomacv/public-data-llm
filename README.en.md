@@ -19,28 +19,32 @@ The batch completed automated processing, classification refinement and final ac
 | Parsed files containing records | 8,904 |
 | Independent processing units | 13,281 |
 | Known logical records | 43,653,625 |
-| Retained records with individual outcomes | 15,861,277 |
+| Quality-excluded placeholder rows | 1,048,465 |
+| Corrected retained records with individual outcomes | 14,812,812 |
 | Entity profiles, including provisional identities | 5,202,714 |
 | Event observations | 5,968,620 |
 | Records requiring review | 6,179,034 |
 
 **Input flow: 5,200 original attachments → 8,904 parsed files containing records → 13,281 independent processing units → relevance screening.** Parsed files include directly readable originals, extracted members and necessary conversion outputs. Processing units are worksheets, document tables or text collections.
 
-## From 43.65 million records to 388,349 inference representatives
+**2026-11-24 quality correction:** A separately validated export excludes 1,048,465 label-only placeholder rows. The corrected semantic route contains 392,154 sources and 3,806 exact duplicates (0.97%). These rows have no entity mentions or event sources, so profile and event totals are unchanged. Original inputs and historical execution records remain preserved. [Correction and acceptance](docs/quality_correction.md).
+
+## Screening, quality cleaning and semantic processing
 
 ```text
 43,653,625 known logical records
 ├─ 27,792,348 explicitly excluded; exclusion ledger retained
-└─ 15,861,277 retained for processing
+├─  1,048,465 label-only placeholder rows; separate quality ledger
+└─ 14,812,812 retained after quality correction
    ├─ 14,420,658 field-plan route; executed programmatically per record
-   └─  1,440,619 complex semantic source records
-      ├─   388,349 distinct content representatives for inference
-      └─ 1,052,270 repeated sources, validated before inference reuse
+   └─  392,154 complex semantic source records
+      ├─   388,348 distinct content representatives for inference
+      └─ 3,806 repeated sources, validated before inference reuse
 ```
 
-After inference, validate and restore outputs to **1,440,619 complex source records**, then combine them with the field-plan route into the **15,861,277-record ledger**. Together with **27,792,348 explicit exclusions**, **all 43,653,625 known records have a recorded destination**. The 388,349 representatives measure semantic-route work; reuse does not delete original records.
+After inference, validate and restore outputs to **392,154 complex source records**, then combine them with the field-plan route into the **14,812,812-record ledger**. Together with **27,792,348 relevance exclusions** and **1,048,465 quality exclusions**, **all 43,653,625 known records have a recorded destination**. The 388,348 representatives measure semantic-route work; reuse does not delete original records.
 
-The retained ledger comprises mutually exclusive outcomes: EXTRACTED **6,300,941**, NO_EVENT **3,381,302**, and REVIEW **6,179,034**, totaling 15,861,277. Profiles, events and source links use different counting units and cannot be added to record totals.
+The retained ledger comprises mutually exclusive outcomes: EXTRACTED **6,300,941**, NO_EVENT **2,332,837**, and REVIEW **6,179,034**, totaling 14,812,812. Profiles, events and source links use different counting units and cannot be added to record totals.
 
 [Interactive lineage and observed progress](https://chaomacv.github.io/public-data-llm/?view=compact&lang=en#explorations) · [Nine-step inputs, methods, counts and files](docs/data_lineage.md) · [Reconciled data interface](showcase/assets/data-lineage.json)
 

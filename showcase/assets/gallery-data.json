@@ -21,7 +21,7 @@
   "subset": {
     "snapshot_at": "2026-11-10T05:56:48.093902+08:00",
     "files": 5200,
-    "records": 15861277,
+    "records": 14812812,
     "events": 5968620,
     "profiles": 5202714,
     "partial_only": false,
@@ -852,7 +852,7 @@
     },
     {
       "status": "NO_EVENT",
-      "count": 3381302
+      "count": 2332837
     },
     {
       "status": "REVIEW",
@@ -892,9 +892,10 @@
     }
   ],
   "dedup": {
-    "source_records": 1440619,
-    "representative_records": 388349,
-    "exact_duplicate_source_records": 1052270
+    "source_records": 392154,
+    "representative_records": 388348,
+    "exact_duplicate_source_records": 3806,
+    "quality_excluded_records": 1048465
   },
   "progress": {
     "total": 388349,
@@ -936,6 +937,9 @@
         "completed": 388349
       }
     ],
-    "series_kind": "observed_processing_snapshots_not_business_events"
-  }
+    "series_kind": "observed_processing_snapshots_not_business_events",
+    "scope": "historical_execution_before_quality_correction",
+    "historical_representative_records": 388349
+  },
+  "quality_correction": "placeholder-quality-correction-v1"
 }

@@ -12,7 +12,10 @@ test('all three real exploration modes reconcile their unit and every parent, wi
   const {tree,nodes}=hierarchy(data.tree);assert.equal(tree.value,mode.total);assert.equal(Math.max(...nodes.map(n=>n.depth)),3);
   assert.ok(!/"(?:record_id|file_id|entity_id|cells|path|address|credit_code)"|\/opt\/|password/.test(raw.toString()));
   if(mode.id==='logical'){const leaves=nodes.filter(n=>!n.children.length);assert.equal(leaves.length,8904);assert.ok(leaves.every(n=>n.value===1&&/^可解析文件 \d{5}$/.test(n.name)));}
-  if(mode.id==='records')assert.equal(nodes.filter(n=>n.depth===2&&n.name==='已筛选排除').reduce((s,n)=>s+n.value,0),27792348);
+  if(mode.id==='records'){
+   assert.equal(nodes.filter(n=>n.depth===2&&n.name==='已筛选排除').reduce((s,n)=>s+n.value,0),27792348);
+   assert.equal(nodes.filter(n=>n.depth===2&&n.name==='质量剔除').reduce((s,n)=>s+n.value,0),1048465);
+  }
  }
 });
 test('zoom shows two descendant levels with area proportional to counts and no sibling leakage',()=>{

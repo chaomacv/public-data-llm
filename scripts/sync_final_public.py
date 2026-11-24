@@ -15,6 +15,8 @@ def write(p, value):
 def sync(final_path, classification_path, assets):
     final, classified = read(final_path), read(classification_path)
     run, gallery = read(assets / 'run-summary.json'), read(assets / 'gallery-data.json')
+    if run.get('quality_correction'):
+        raise ValueError('Quality-corrected assets require corrected exports; historical sync cannot overwrite them')
     if not all(final['audit'][k] for k in ['all_original_files_accounted_for', 'all_readable_records_accounted_for']):
         raise ValueError('Final coverage audit required')
     if not final['exports_round_trip_validated'] or classified['total_events'] != final['counts']['events']:

@@ -9,7 +9,7 @@
     {title:'解析与抽样', input:'表格、文档、压缩包、XML 与地理数据库', method:'按实际内容识别格式；读取原生文字，必要时 OCR；保留表头、位置、质量标记及首中尾样本。', output:'可解析文件、文件卡片与独立处理单元', files:['02_profiles/文件总表.csv','02_profiles/file_cards_native.jsonl','02_profiles/all_profiles_native.json'], code:'bulk_native.py', metric:d=>[d.input.parsed_files,'个有记录的可解析文件']},
     {title:'文件筛选', input:'文件名、表头、首中尾与固定种子样本', method:'依据文件卡片与字段理解判断相关性；本页将两轮排除合并展示，保留判断依据与来源。抽样判断仍需独立抽查。', output:'逐表判断、依据与模型原回复', files:['03_screen/筛选总表.csv','03_screen/scopes/','03_screen/summary.json'], code:'bulk_screen.py', metric:d=>[d.input.scopes,'个独立处理单元进入文件判断']},
     {title:'处理方案', input:'相关独立处理单元、样本与事件类别定义', method:'模型先读表头和样本，确定企业字段、事件证据及适用条件；能用字段规则处理的交给程序，复杂正文交给模型逐条理解。', output:'程序提取、主体信息、逐条语义处理与复核分流', files:['04_plans/字段方案总表.csv','04_plans/scopes/','04_plans/config.json'], code:'bulk_plan.py', metric:d=>[window.BEIRunVisual.screeningView(d).continuing_units,'个单元进入处理方案分流（含待复核）']},
-    {title:'完整读取', input:'保留文件与已校验字段方案', method:'逐条保存完整单元格、稳定记录 ID 和上下文。结构化方案逐行应用，复杂内容另交模型理解。', output:'原始记录、语境、准备块与待推理任务', files:['05_records/<file_id>/rows.jsonl','05_records/<file_id>/contexts.json','05_records/<file_id>/chunks.jsonl'], code:'bulk_rows.py', metric:d=>[d.preparation.retained_records,'条保留记录有完整原值']},
+    {title:'完整读取', input:'保留文件与已校验字段方案', method:'完整读取后识别仅含表头标签的占位行，单列质量剔除；保留记录保存原值、编号和上下文，再按字段方案与复杂语义分流。', output:'原始记录、语境、准备块与待推理任务', files:['05_records/<file_id>/rows.jsonl','05_records/<file_id>/contexts.json','05_records/<file_id>/chunks.jsonl'], code:'bulk_rows.py', metric:d=>[d.preparation.retained_records,'条保留记录有完整原值']},
     {title:'抽取与核验', input:'复杂内容代表及各自表头、语境与来源 ID', method:'完整内容精确分组后推理；按实际 tokenizer 预算拆组，再批量提交。核对主体、原文引用及记录归属，逐条回填重复来源；不确定项进入复核。', output:'逐条状态、来源引用、模型请求与原回复', files:['06_validation/内容去重总表.csv','06_validation/content_indices/','06_validation/<file_id>/record_results.jsonl'], code:'bulk_semantics.py', metric:d=>[d.semantic_work.representative_records,'个不同内容代表需语义处置']},
     {title:'身份关联', input:'已通过来源校验的主体提及', method:'优先校验信用代码，再用完整名称与非空地址保守关联。代码冲突阻止归并；近名只形成复核候选。', output:'主体、提及、匹配依据与近名候选', files:['07_entities/results.duckdb','07_entities/entity_mentions.parquet','07_entities/name_neighbors.parquet'], code:'bulk_aggregate.py', metric:d=>[d.final_counts?.entities,'个主体画像（含临时身份）']},
     {title:'结果导出', input:'主体归属、事件与全部来源提及', method:'将画像、事件与来源导出为 JSONL 和 Parquet；逐条台账使用 Parquet。保留事件阶段、原始金额日期与质量标记。', output:'画像、事件观察、来源与记录台账', files:['08_results/profiles.parquet','08_results/events.parquet','08_results/event_sources.parquet','08_results/record_ledger.parquet'], code:'bulk_aggregate.py', metric:d=>[d.final_counts?.events,'条事件观察（保守归并）']},
@@ -73,9 +73,9 @@
     $('run-snapshot-date').textContent='固定输入 / '+data.snapshot_date+' · 汇总更新 / '+data.updated_at;
     $('dedup-source-count').textContent=format(data.preparation.pending_semantic_source_records);$('dedup-representative-count').textContent=format(data.semantic_work.representative_records);
     const ratio=data.semantic_work.exact_duplicate_source_records/data.preparation.pending_semantic_source_records*100;
-    $('dedup-reuse-percent').textContent=ratio.toFixed(1)+'%';$('dedup-unique-bar').style.width=(100-ratio)+'%';
+    $('dedup-reuse-percent').textContent=ratio.toFixed(2)+'%';$('dedup-unique-bar').style.width=(100-ratio)+'%';
     $('dedup-reuse-bar').style.width=ratio+'%';$('dedup-reuse-count').textContent=format(data.semantic_work.exact_duplicate_source_records);
-    $('dedup-unique-bar').parentElement.setAttribute('aria-label',(100-ratio).toFixed(1)+'% 不同内容代表，'+ratio.toFixed(1)+'% 可复用来源记录。');
+    $('dedup-unique-bar').parentElement.setAttribute('aria-label',(100-ratio).toFixed(2)+'% 不同内容代表，'+ratio.toFixed(2)+'% 可复用来源记录。');
     $('batch-before-value').textContent=data.benchmarks.batching.serial_seconds.toFixed(1)+' s';
     $('batch-after-value').textContent=data.benchmarks.batching.packed_seconds.toFixed(1)+' s';
     $('batch-after-bar').style.width=(data.benchmarks.batching.packed_seconds/data.benchmarks.batching.serial_seconds*100)+'%';
