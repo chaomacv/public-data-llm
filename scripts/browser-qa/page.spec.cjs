@@ -82,6 +82,41 @@ test('review rounds expand the file card without replacing samples in either lan
   await page.locator('[data-language="zh"]').click();
   await expect(page.locator('#sample-review-stage')).toContainText('人工审查');
 });
+
+test('agent harness exposes tool contracts and enforces review branches in both languages',async({page},info)=>{
+ const section=page.locator('#agent-harness');await expect(section).toHaveAttribute('data-ready','true');
+ await section.scrollIntoViewIfNeeded();
+ await expect(section).toHaveAttribute('data-phase','released');await expect(page.locator('#harness-revision')).toHaveText('r3');
+ await expect(page.locator('#harness-retry-count')).toHaveText('2 / 2');
+ await expect(page.locator('#harness-log [data-tool="redo_unit"]')).toHaveCount(2);
+ await expect(page.locator('#harness-last-receipt')).toContainText('RELEASED');
+ const input=JSON.parse(await page.locator('#harness-tool-input').textContent());
+ expect(input.tool).toBe('review_with_model');expect(input.input).toHaveProperty('sample_ref');expect(input.input).not.toHaveProperty('outcome');
+ await page.locator('[data-harness-tool="review_with_model"]').focus();
+ await page.locator('[data-harness-tool="review_with_model"]').press('End');
+ await expect(page.locator('#harness-tool-name')).toHaveText('release_unit');
+ await page.locator('[data-harness-tool="release_unit"]').press('Home');
+ await expect(page.locator('#harness-tool-name')).toHaveText('expand_file_card');
+ for(const [scenario,phase,code] of [['counts','blocked','ACCOUNTING_MISMATCH'],['human','held','HUMAN_REVIEW_PENDING'],['stale','blocked','STALE_OR_FOREIGN_REVISION'],['normal','released','RELEASED'],['retry','released','RELEASED']]){
+  await page.locator('#harness-scenario').selectOption(scenario);await expect(section).toHaveAttribute('data-phase',phase);
+  await expect(page.locator('#harness-last-receipt')).toContainText(code);
+ }
+ await page.locator('#harness-scenario').selectOption('escalate');
+ await page.locator('[data-harness-tool="review_with_model"]').click();
+ await section.screenshot({path:info.outputPath('agent-harness.png')});
+ await page.locator('[data-language="en"]').click();
+ await expect(page.locator('#harness-phase')).toHaveText('Current revision released');
+ for(const name of ['expand_file_card','validate_records','reconcile_counts','review_with_model','redo_unit','request_human_review','trace_evidence','release_unit']){
+  await page.locator(`[data-harness-tool="${name}"]`).click();
+  expect(await section.innerText()).not.toMatch(/[\u3400-\u9fff]/);
+ }
+ await page.locator('#harness-scenario').selectOption('human');await expect(page.locator('#harness-phase')).toHaveText('Awaiting further human review');
+ await page.locator('#harness-scenario').selectOption('escalate');
+ await page.locator('[data-harness-tool="review_with_model"]').click();
+ expect(await page.evaluate(()=>document.documentElement.scrollWidth)).toBeLessThanOrEqual(page.viewportSize().width+1);
+ await section.screenshot({path:info.outputPath('agent-harness-english.png')});
+ await page.locator('[data-language="zh"]').click();await expect(page.locator('#harness-phase')).toHaveText('当前版本已放行');
+});
 test('bounded viewport shows three full desktop cards with clipped neighbors',async({page},info)=>{
   await page.locator('#explorations').scrollIntoViewIfNeeded();
   await expect.poll(async()=>(await measure(page)).full).toBe(page.viewportSize().width>1100?3:1);
