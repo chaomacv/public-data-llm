@@ -8,7 +8,7 @@
   if(p===0)return 0;if(p===1)return 1;
   return -Math.expm1(n*Math.log1p(-p));
  }
- function nextTab(index,key,total=4){
+ function nextTab(index,key,total=5){
   if(key==='Home')return 0;if(key==='End')return total-1;
   if(key==='ArrowRight')return (index+1)%total;if(key==='ArrowLeft')return (index+total-1)%total;
   return null;
@@ -54,6 +54,11 @@
   }
   return {errors,action:errors.length?'complex_semantic':status==='已中标'?'confirmed':status==='拟中标'?'proposed':'no_event'};
  }
+ function reviewRoute(first,second){
+  if(!['pass','fail'].includes(first)||!['pass','fail'].includes(second))throw Error('Invalid review outcome');
+  if(first==='pass')return ['external_sample','human_sample'];
+  return ['external_sample','main_redo_unit','external_resample',...(second==='pass'?['human_sample']:['external_redo_unit','human_review_unit'])];
+ }
  async function mount(win){
   const doc=win.document,$=id=>doc.getElementById(id),section=$('review-mechanism');if(!section)return;
   const tabs=[...section.querySelectorAll('[data-review-tab]')];
@@ -69,6 +74,13 @@
    $('review-award-errors').hidden=!checked.errors.length;
   }
   $('review-award-amount').addEventListener('input',checkAward);$('review-award-status').addEventListener('change',checkAward);checkAward();
+  function modelRoute(){
+   const first=$('review-model-first').value,second=$('review-model-second').value;
+   const labels={external_sample:'外部模型抽样核验',main_redo_unit:'修正问题后，主模型重做整个单元',external_resample:'新随机样本复抽＋原错例回归',external_redo_unit:'外部模型重做整个单元',human_sample:'人工抽样验收',human_review_unit:'人工审查，仍有错误则扩大到全单元'};
+   $('review-model-route').innerHTML=reviewRoute(first,second).map(step=>'<li data-review-route="'+step+'">'+labels[step]+'</li>').join('');
+   $('review-model-second-control').hidden=first==='pass';
+  }
+  $('review-model-first').addEventListener('change',modelRoute);$('review-model-second').addEventListener('change',modelRoute);modelRoute();
   function calculate(){const n=Number($('review-sample-n').value),p=Number($('review-error-rate').value);$('review-sample-n-value').textContent=String(n);const probability=detectionProbability(n,p);$('review-detection').textContent=probability<1&&probability>.999?'>99.9%':(100*probability).toFixed(1)+'%';}
   $('review-sample-n').addEventListener('input',calculate);$('review-error-rate').addEventListener('change',calculate);calculate();
   const response=await win.fetch('assets/data-lineage.json?v=main-flow-20261125');if(!response.ok)throw Error('Lineage unavailable');
@@ -77,5 +89,5 @@
   $('review-accounting').innerHTML=rows.map(([label,total,parts])=>'<div><span>'+label+'</span><strong>'+fmt(total)+'</strong><small>= '+parts.map(fmt).join(' + ')+'</small></div>').join('');
   section.dataset.ready='true';
  }
- return {detectionProbability,nextTab,isChineseNumber,isAmount,validateAward,mount};
+ return {detectionProbability,nextTab,isChineseNumber,isAmount,validateAward,reviewRoute,mount};
 });

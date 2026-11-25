@@ -604,25 +604,25 @@ test('review gates expose implemented checks, proposed human sampling and a work
  await expect(section).toHaveAttribute('data-ready','true');
  await expect(page.locator('#review-panel-0')).toBeVisible();await expect(section).toContainText('金额与单位');
  await page.locator('[data-review-tab="1"]').click();await expect(page.locator('#review-accounting')).toContainText('43,653,625');
- await page.locator('[data-review-tab="2"]').click();await expect(page.locator('#review-panel-2')).toBeVisible();
+ await page.locator('[data-review-tab="3"]').click();await expect(page.locator('#review-panel-3')).toBeVisible();
  await expect(page.locator('#review-detection')).toHaveText('95.2%');await expect(section).toContainText('抽查参数配置与检出概率计算');
  await page.locator('#review-error-rate').selectOption('0.05');await expect(page.locator('#review-detection')).toHaveText('>99.9%');
  await page.locator('#review-error-rate').selectOption('0.02');
  await page.locator('#review-sample-n').focus();await page.locator('#review-sample-n').press('End');await expect(page.locator('#review-sample-n-value')).toHaveText('300');
  await expect(page.locator('#review-detection')).toHaveText('99.8%');
- await page.locator('[data-review-tab="2"]').focus();await page.locator('[data-review-tab="2"]').press('ArrowRight');await expect(page.locator('#review-panel-3')).toBeVisible();
- for(const i of [0,1,2,3]){
+ await page.locator('[data-review-tab="3"]').focus();await page.locator('[data-review-tab="3"]').press('ArrowRight');await expect(page.locator('#review-panel-4')).toBeVisible();
+ for(const i of [0,1,2,3,4]){
   await page.locator(`[data-review-tab="${i}"]`).click();
   expect(await section.evaluate(el=>el.scrollWidth-el.clientWidth)).toBeLessThanOrEqual(1);
   await section.screenshot({path:info.outputPath('review-gate-'+i+'.png')});
  }
  await page.locator('[data-language="en"]').click();
  await expect(section).toContainText('Sampling configuration and detection probability');
- for(const i of [0,1,2,3]){
+ for(const i of [0,1,2,3,4]){
   await page.locator(`[data-review-tab="${i}"]`).click();
   expect(await page.locator('#review-panel-'+i).innerText()).not.toMatch(/[\u3400-\u9fff]/);
   expect(await page.evaluate(()=>document.documentElement.scrollWidth)).toBeLessThanOrEqual(page.viewportSize().width+1);
-  if(i===2)await section.screenshot({path:info.outputPath('review-human-english.png')});
+  if(i===3)await section.screenshot({path:info.outputPath('review-human-english.png')});
  }
 });
 
@@ -654,4 +654,18 @@ test('award example logs exact enum and amount errors then accepts a corrected r
  await expect(page.locator('#review-award-errors')).toContainText('ENUM_NOT_ALLOWED');
  expect(await page.locator('#review-panel-0').innerText()).not.toMatch(/[\u3400-\u9fff]/);
  await page.locator('#review-panel-0').screenshot({path:info.outputPath('award-rule-errors-english.png')});
+});
+
+
+test('external model sampling escalates by processing unit',async({page})=>{
+ await page.goto('/?lang=zh#review-mechanism');await expect(page.locator('#review-mechanism')).toHaveAttribute('data-ready','true');
+ await page.locator('[data-review-tab="2"]').click();
+ await expect(page.locator('[data-review-route="external_redo_unit"]')).toBeVisible();
+ await expect(page.locator('[data-review-route="human_review_unit"]')).toBeVisible();
+ await page.locator('#review-model-second').selectOption('pass');
+ await expect(page.locator('[data-review-route="external_redo_unit"]')).toHaveCount(0);
+ await expect(page.locator('[data-review-route="human_sample"]')).toBeVisible();
+ await page.locator('#review-model-first').selectOption('pass');
+ await expect(page.locator('#review-model-second-control')).toBeHidden();
+ await expect(page.locator('#review-model-route li')).toHaveCount(2);
 });
