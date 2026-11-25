@@ -1111,7 +1111,6 @@
   "一张中标表，对应一份可执行规则。": "One award table, one executable rule set.",
   "已实现 · 字段映射与逐行校验演示": "Implemented · Field mapping and row validation demo",
   "先让本地LLM结合文件卡片确定字段含义，再把字段对应、金额类型和状态取值写成这张表的规则。下面用一份合成文件，展示规则怎样约束每一行。": "Use the local LLM and a file card to interpret fields, then define mappings, amount types and allowed statuses for that table. This synthetic file shows how the rules constrain individual rows.",
-  "合成采购中标结果.xlsx / 结果公告": "synthetic-award.xlsx / results",
   "文件卡片：中标单位、中标金额（万元）、中标状态；单位由表头确定。": "File card: winning supplier, award amount (CNY 10k), award status. The header defines the unit.",
   "行": "Row",
   "中标单位": "Winning supplier",
