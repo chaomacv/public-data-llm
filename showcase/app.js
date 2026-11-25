@@ -26,11 +26,22 @@
       if (next !== undefined) { event.preventDefault(); setLab(tabs[next].dataset.lab, true); }
     });
   });
-  document.querySelectorAll('[data-open-lab]').forEach(link => link.addEventListener('click', () => setLab(link.dataset.openLab)));
+  document.querySelectorAll('[data-open-lab]').forEach(link => link.addEventListener('click', () => {
+    setLab(link.dataset.openLab);
+    if (link.dataset.sampleReview) {
+      $('sample-review-stage').value = link.dataset.sampleReview;
+      renderSamples();
+    }
+  }));
 
   function renderSamples() {
     const count = Number($('sample-count').value);
-    const selected = model.sampleRows(120, count, $('random-sample').checked);
+    const random = $('random-sample').checked;
+    const selected = model.sampleRows(120, count, random, Number($('sample-review-stage').value));
+    const baseline = model.sampleRows(120, count, random);
+    $('sample-base-count').textContent = baseline.size;
+    $('sample-review-added').textContent = selected.size - baseline.size;
+    $('sample-card-total').textContent = selected.size;
     $('sample-count-value').value = count;
     $('sample-selected').textContent = selected.size;
     const percent = (selected.size / 120 * 100).toFixed(1) + '%';
@@ -42,13 +53,15 @@
       const cell = document.createElement('span');
       const kind = selected.get(i);
       cell.className = 'sample-cell' + (kind ? ' ' + kind : '');
-      cell.title = `记录 ${String(i + 1).padStart(3, '0')} · ${kind === 'stratified' ? '首中尾样本' : kind === 'random' ? '随机补样' : '原始记录保留，未进入本轮样本'}`;
+      const labels = {stratified: '首中尾样本', random: '随机补样', external: '外部模型审查新增', human: '人工审查新增'};
+      cell.title = `记录 ${String(i + 1).padStart(3, '0')} · ${labels[kind] || '原始记录保留，未进入本轮样本'}`;
       fragment.append(cell);
     }
     $('sample-grid').replaceChildren(fragment);
   }
   $('sample-count').addEventListener('input', renderSamples);
   $('random-sample').addEventListener('change', renderSamples);
+  $('sample-review-stage').addEventListener('change', renderSamples);
   renderSamples();
 
   const chunkRecords = Array.from({length: 12}, (_, index) => ({

@@ -122,6 +122,30 @@ input[type="checkbox"] { width: 14px; height: 14px; accent-color: var(--blue); }
 .sample-cell { display: block; aspect-ratio: 1; border-radius: 1px; background: #e8ecf6; }
 .sample-cell.stratified { background: var(--blue); }
 .sample-cell.random { background: #ff8a56; }
+.sample-cell.external,.dot.external { background:#6db8a6; }
+.sample-cell.human,.dot.human { background:#aa87ce; }
+.sample-review-select { width:100%; max-width:100%; margin:10px 0 0; padding:9px 10px; border:1px solid var(--line); background:#fff; color:var(--ink); font:13px var(--sans); }
+.lab-explanation .sample-supplement-note { font-size:12px; color:var(--muted); }
+.sample-card-growth { display:flex; align-items:center; flex-wrap:wrap; gap:8px 12px; margin-top:20px; padding:13px 15px; background:#f4f6fb; color:#63748d; font-size:12px; line-height:1.9; }
+.sample-card-growth span { display:flex; align-items:center; gap:8px; }.sample-card-growth b { font:16px var(--mono); color:#4566ad; }.sample-card-growth i { font-style:normal; color:#9da7b8; }
+
+/* Scenario extensions keep the same light, editorial document structure. */
+.extension-cards { display:grid; grid-template-columns:repeat(3,minmax(0,1fr)); gap:24px; }
+.extension-card { --extension-color:#4269d0; min-width:0; padding:24px 22px; border:1px solid var(--line); border-top:3px solid var(--extension-color); background:#fff; }
+.extension-urban { --extension-color:#57a28e; }.extension-market { --extension-color:#ac88c4; }
+.extension-card-top { display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:7px; margin-bottom:20px; color:var(--extension-color); font:10px/1.8 var(--mono); letter-spacing:.6px; }
+.extension-card-top>span:last-child { padding:3px 8px; background:#f5f6fa; color:#718099; font:11px/1.8 var(--sans); letter-spacing:0; }
+.extension-card h3 { font-size:23px; font-weight:550; line-height:1.5; letter-spacing:-.4px; }
+.extension-question { margin:12px 0 24px; color:#6b7586; font-size:13px; line-height:1.9; }
+.extension-card dl { margin:0; }.extension-card dt { margin-top:18px; color:#8b96a7; font-size:11px; letter-spacing:.5px; }.extension-card dd { margin:5px 0 0; color:#4d586a; font-size:13px; line-height:1.95; }
+.extension-prompt { margin-top:25px; padding:14px 15px; background:#f6f8fc; border-left:2px solid var(--extension-color); }.extension-prompt>span { font-size:11px; color:var(--extension-color); }.extension-prompt p { margin-top:5px; font-size:12px; line-height:1.9; color:#62728b; }
+.extension-check { margin-top:18px; padding-top:14px; border-top:1px solid #e8ecf2; font-size:12px; line-height:1.9; color:#8691a2; }
+.extension-adaptation { margin-top:32px; display:grid; grid-template-columns:minmax(0,.8fr) minmax(0,1.2fr); gap:40px; padding:28px; background:#fafbfd; border:1px solid var(--line); }
+.extension-adaptation h3 { margin:9px 0 13px; font-size:24px; line-height:1.5; font-weight:550; }.extension-adaptation>div>p:last-child { color:#748196; font-size:13px; line-height:1.95; }
+.extension-steps { display:grid; grid-template-columns:repeat(2,minmax(0,1fr)); gap:22px 25px; padding:0; margin:0; list-style:none; }.extension-steps li { min-width:0; display:flex; gap:12px; }.extension-steps li>span { font:12px/1.9 var(--mono); color:#a0afc5; }.extension-steps strong { font-size:13px; font-weight:550; color:#4b6080; }.extension-steps p { font-size:12px; line-height:1.9; color:#8390a3; margin-top:5px; }
+.extension-bottom { padding-top:18px; font-size:12px; color:#8390a2; line-height:1.95; }
+@media(max-width:900px) { .extension-cards { grid-template-columns:minmax(0,1fr); gap:20px; }.extension-adaptation { grid-template-columns:minmax(0,1fr); gap:24px; } }
+@media(max-width:600px) { .extension-card { padding:22px 19px; }.extension-adaptation { padding:23px 19px; }.extension-steps { grid-template-columns:minmax(0,1fr); }.extension-card h3 { font-size:22px; } }
 .dot { display: inline-block; width: 7px; height: 7px; border-radius: 50%; flex-shrink: 0; }
 .sage { background: var(--blue); }.sand { background: #ff8a56; }.blue { background: #a463f2; }.pale { background: #e8ecf6; }
 .sample-legend { display: flex; gap: 17px; flex-wrap: wrap; font-size: 11px; color: var(--muted); margin-top: 18px; }
