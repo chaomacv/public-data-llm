@@ -61,7 +61,7 @@
     $('html-story-example').textContent=text?'合成HTML有限公司已处罚，罚款100元。':'<p class="notice">合成<span>HTML</span>有限公司已处罚，罚款100元。</p>';
     document.querySelectorAll('[data-html-view]').forEach(item=>item.setAttribute('aria-pressed',String(item===button)));
   }));
-  Promise.all(['run-summary.json','data-lineage.json','routing-update.json'].map(name=>fetch('assets/'+name+'?v=review-routing-20261125').then(response=>{
+  Promise.all(['run-summary.json','data-lineage.json','routing-update.json'].map(name=>fetch('assets/'+name+'?v=main-flow-20261125').then(response=>{
     if(!response.ok)throw new Error('Aggregate snapshot unavailable');return response.json();
   }))).then(([data,flow,routing])=>{
     lineage=window.BEILineage.validate(flow);

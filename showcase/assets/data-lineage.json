@@ -11,6 +11,7 @@
     "quality-correction.json": "000148be7884a65aa515f351ba8fb61b4d7a70ebac26192251620af1c4a747d7"
   },
   "counts": {
+    "events": 5968620,
     "known": 43653625,
     "excluded": 27792348,
     "retained": 14812812,
@@ -50,54 +51,42 @@
     }
   ],
   "flow_axis": "processing_stage_order_not_elapsed_time",
-  "flow_scope": "retained_to_semantic_representatives_not_all_final_results",
+  "flow_scope": "parsed_records_to_retained_records_to_event_observations",
   "flow_points": [
     {
       "id": "parsed",
       "name": "解析总量",
       "count": 43653625,
       "count_key": "known",
-      "unit": "条已知逻辑记录",
+      "unit": "条解析记录",
       "step": 1,
       "details": [
         "8,904 个有记录的可解析文件 → 13,281 个独立处理单元 → 43,653,625 条已知记录。",
-        "独立处理单元指工作表、文档表格或正文集合；均保留原附件关系。"
+        "统计解析器识别的完整记录。"
       ]
     },
     {
       "id": "retained",
-      "name": "保留",
+      "name": "保留记录",
       "count": 14812812,
       "count_key": "retained",
       "unit": "条保留记录",
       "step": 4,
       "details": [
-        "相关性排除 27,792,348 条，质量剔除 1,048,465 条，保留 14,812,812 条。",
-        "43,653,625 = 27,792,348 + 1,048,465 + 14,812,812"
+        "相关性排除 27,792,348；质量剔除 1,048,465；保留 14,812,812 = 字段方案 14,420,658 + 复杂语义来源 392,154。",
+        "经过相关性筛选与占位行质量清洗。"
       ]
     },
     {
-      "id": "semantic",
-      "name": "语义来源",
-      "count": 392154,
-      "count_key": "semantic",
-      "unit": "条复杂来源记录",
-      "step": 4,
+      "id": "events",
+      "name": "事件观察",
+      "count": 5968620,
+      "count_key": "events",
+      "unit": "条事件观察",
+      "step": 7,
       "details": [
-        "14,420,658 条走字段方案；392,154 条进入逐条语义通道。",
-        "14,812,812 = 14,420,658 + 392,154"
-      ]
-    },
-    {
-      "id": "representatives",
-      "name": "内容代表",
-      "count": 388348,
-      "count_key": "representatives",
-      "unit": "个内容代表",
-      "step": 5,
-      "details": [
-        "精确分组：388,348 个代表 + 3,806 条重复来源。",
-        "仅同文件、同表、完整字段和语境一致才复用；逐条核对来源后回填。"
+        "两条处理通道的结果汇合，经主体关联与事件归并形成5,968,620条事件观察。",
+        "此节点按事件计量；一条记录可不产生事件，也可包含多个事件。"
       ]
     }
   ],

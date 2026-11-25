@@ -167,7 +167,7 @@ test('lineage conserves every routing branch and matches its exact source export
  assert.equal(lineage.counts.retained,final.counts.record_ledger);
  assert.equal(lineage.counts.mapped,final.preparation.field_mapped_records);
  assert.equal(lineage.stages.length,9);
- assert.deepEqual(lineage.flow_points.map(p=>p.count),[43653625,14812812,392154,388348]);
+ assert.deepEqual(lineage.flow_points.map(p=>p.count),[43653625,14812812,5968620]);
  assert.equal(lineage.outcomes.REVIEW,6179034);
  assert.ok(!/password|10\.126\.|\/opt\/|"cells"|"record_id"/.test(JSON.stringify(lineage)));
 });
@@ -177,8 +177,8 @@ test('stage order and actual inference time remain distinct while both chart sca
  assert.ok(m.series(d,'flow').every(p=>p.at===undefined));
  assert.deepEqual(m.series(d,'time').map(p=>p.count),d.progress.points.map(p=>p.completed));
  for(const log of [true,false]){
-  const p=m.positions(d,'flow',log).points;assert.equal(p[3].count,388348);assert.equal(p[2].count,392154);
-  assert.ok(p[3].y>p[2].y);assert.ok(p[0].y<p[1].y);assert.ok(p.every(n=>Number.isFinite(n.x)&&Number.isFinite(n.y)));
+  const p=m.positions(d,'flow',log).points;assert.equal(p[2].count,5968620);assert.equal(p[1].count,14812812);
+  assert.ok(p[2].y>p[1].y);assert.ok(p[0].y<p[1].y);assert.ok(p.every(n=>Number.isFinite(n.x)&&Number.isFinite(n.y)));
  }
  const p=m.positions(d,'time',false).points;
  assert.ok(p[1].x-p[0].x < p[6].x-p[5].x);

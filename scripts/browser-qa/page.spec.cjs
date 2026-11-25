@@ -398,18 +398,18 @@ test('sunburst pointer focus has no rectangular outline and keyboard focus remai
 });
 
 
-test('lineage decreases along the semantic branch while historical time remains separate',async({page},info)=>{
+test('lineage decreases from parsed records to exported events while historical time remains separate',async({page},info)=>{
  await page.locator('[data-gallery-page="8"]').click();await page.locator('[data-notebook="8"] .notebook-reader-open').click();
  const chart=page.locator('#gallery-timeline-chart');await expect(chart).toHaveAttribute('data-ready','true');
- await expect(chart).toHaveAttribute('data-mode','flow');await expect(page.locator('[data-lineage-point]')).toHaveCount(4);
- await page.locator('[data-lineage-point="3"]').focus();
- await expect(chart).toHaveAttribute('data-selected-count','388348');
- await expect(page.locator('#lineage-info')).toContainText('3,806');
- const representative=page.locator('[data-lineage-point="3"]');
- if(page.viewportSize().width>1100){await representative.hover();await expect(page.locator('.lineage-tooltip')).toBeVisible();await expect(page.locator('.lineage-tooltip')).toContainText('388,348');}
- await page.locator('[data-lineage-point="2"]').click();await expect(chart).toHaveAttribute('data-selected-count','392154');
- await page.locator('[data-lineage-point="2"]').press('ArrowRight');await expect(chart).toHaveAttribute('data-selected-count','388348');
- await page.locator('#lineage-scale').selectOption('linear');await expect(chart).toHaveAttribute('data-selected-count','388348');
+ await expect(chart).toHaveAttribute('data-mode','flow');await expect(page.locator('[data-lineage-point]')).toHaveCount(3);
+ await page.locator('[data-lineage-point="2"]').focus();
+ await expect(chart).toHaveAttribute('data-selected-count','5968620');
+ await expect(page.locator('#lineage-info')).toContainText('两条处理通道');
+ const representative=page.locator('[data-lineage-point="2"]');
+ if(page.viewportSize().width>1100){await representative.hover();await expect(page.locator('.lineage-tooltip')).toBeVisible();await expect(page.locator('.lineage-tooltip')).toContainText('5,968,620');}
+ await page.locator('[data-lineage-point="1"]').click();await expect(chart).toHaveAttribute('data-selected-count','14812812');
+ await page.locator('[data-lineage-point="1"]').press('ArrowRight');await expect(chart).toHaveAttribute('data-selected-count','5968620');
+ await page.locator('#lineage-scale').selectOption('linear');await expect(chart).toHaveAttribute('data-selected-count','5968620');
  await page.locator('#lineage-scale').selectOption('log');await representative.click();
  await page.screenshot({path:info.outputPath('lineage-stage-flow.png')});
  await page.locator('[data-lineage-mode="time"]').click();await expect(chart).toHaveAttribute('data-mode','time');
@@ -420,7 +420,7 @@ test('lineage decreases along the semantic branch while historical time remains 
  await expect(chart).toHaveAttribute('data-selected-count','42540');
  await page.locator('#lineage-scrub').press('End');
  await page.screenshot({path:info.outputPath('lineage-observed-progress.png')});
- await page.locator('[data-lineage-mode="flow"]').click();await expect(chart).toHaveAttribute('data-selected-count','388348');
+ await page.locator('[data-lineage-mode="flow"]').click();await expect(chart).toHaveAttribute('data-selected-count','5968620');
 });
 
 test('nine-step lineage table and selected details expose the same conserved record quantities',async({page},info)=>{
