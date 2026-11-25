@@ -1041,7 +1041,7 @@
   "沿语义处理分支逐步筛选：解析总量 → 保留记录 → 复杂语义来源 → 内容代表。字段方案通道另行保留。": "Follow one semantic branch: parsed total → retained records → semantic sources → representatives. The field-plan route remains separate.",
   "沿语义处理分支展示逐步筛选，节点数量单向递减": "Progressive filtering along one semantic branch; counts decrease at every point",
   "审查机制：约束、对账、抽查与追溯。": "Review mechanisms: constraints, accounting, sampling and provenance.",
-  "字段方案、来源核验与数量对账已有实现；增强规则和人工抽查明确作为方法设计，尚未形成独立语义准确率结论。": "Field plans, source checks and count reconciliation are implemented. Stronger rules and human sampling are proposed designs; independent semantic accuracy has not been established.",
+  "审查机制围绕字段方案、来源核验、数量对账、人工抽查与原始证据追溯展开。": "The review mechanism covers field plans, source validation, count reconciliation, human sampling and traceability to original evidence.",
   "审查机制分页": "Review mechanism tabs",
   "逐表约束": "Table constraints",
   "逐条对账": "Record accounting",
