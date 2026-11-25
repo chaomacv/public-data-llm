@@ -177,6 +177,10 @@ The JSON/SQLite files below belong to the small-sample workflow. For full-corpus
 
 `entities.json`, `entity_mentions.json` and `match_decisions.json` retain provenance and match reasons. Conflicting reliable credit codes are not merged. Same-name records without addresses remain separate, with candidates for review. A valid code structure and checksum are not authoritative company-registry verification.
 
+## Model input comparison
+
+Compare file-card inputs for 1,347 + 408 field-plan units plus per-record inputs for 382 + 475 semantic units against interpreting every retained record individually. Both sides use the same Qwen3-8B tokenizer and a fixed complete-record template. Card 06 and the engineering section share the [token aggregates](showcase/assets/token-comparison.json). The hybrid input is 3,788,391,368 tokens against a 25,217,680,296-token all-record baseline: 15.02% of the baseline, or an 84.98% input-volume reduction. This measures the two specified input routes; outputs, retries and other overheads are accounted separately. [Scope and reproduction](docs/token_comparison.md).
+
 ## Current boundaries
 
 **Routing update (2026-11-25, not executed):** all 475 previously unresolved processing units now route to complex semantic processing, with original plan reasons, validation errors and quality flags linked to an issue ledger. Together with the original 382 semantic units, the planned total is 857. The page shows this pending change; published result counts still describe the historical batch. [Routing and issue records](docs/review_semantic_routing.md).

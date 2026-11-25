@@ -79,11 +79,6 @@
     $('run-overall-state').textContent=done?'本批流程已完成，含待复核结果':'本批全量抽取进行中';
     $('run-overall-state').dataset.state=done?'complete':'running';
     $('run-snapshot-date').textContent='固定输入 / '+data.snapshot_date+' · 汇总更新 / '+data.updated_at;
-    $('dedup-source-count').textContent=format(data.preparation.pending_semantic_source_records);$('dedup-representative-count').textContent=format(data.semantic_work.representative_records);
-    const ratio=data.semantic_work.exact_duplicate_source_records/data.preparation.pending_semantic_source_records*100;
-    $('dedup-reuse-percent').textContent=ratio.toFixed(2)+'%';$('dedup-unique-bar').style.width=(100-ratio)+'%';
-    $('dedup-reuse-bar').style.width=ratio+'%';$('dedup-reuse-count').textContent=format(data.semantic_work.exact_duplicate_source_records);
-    $('dedup-unique-bar').parentElement.setAttribute('aria-label',(100-ratio).toFixed(2)+'% 不同内容代表，'+ratio.toFixed(2)+'% 可复用来源记录。');
     $('batch-before-value').textContent=data.benchmarks.batching.serial_seconds.toFixed(1)+' s';
     $('batch-after-value').textContent=data.benchmarks.batching.packed_seconds.toFixed(1)+' s';
     $('batch-after-bar').style.width=(data.benchmarks.batching.packed_seconds/data.benchmarks.batching.serial_seconds*100)+'%';

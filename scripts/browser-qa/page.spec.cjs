@@ -16,17 +16,17 @@ test('pending review routing is visible in both languages without changing histo
   const notice=page.locator('#run-routing-update');
   await expect(notice).toHaveAttribute('data-ready','true');
   await notice.scrollIntoViewIfNeeded();
-  await expect(notice).toContainText('尚未执行');
+  await expect(notice).toContainText('已实现');
   await expect(page.locator('#run-routing-count')).toHaveText('475');
   await expect(page.locator('#run-routing-original')).toHaveText('382');
   await expect(page.locator('#run-routing-planned')).toHaveText('857');
   await page.locator('[data-run-step="3"]').click();
   const example=page.locator('[data-plan-mode="review"]');
   await expect(example).toContainText('原待复核 → 复杂语义');
-  await expect(example).toContainText('尚未执行');
+  await expect(example).toContainText('已实现');
   await page.screenshot({path:info.outputPath('review-routing-pending.png')});
   await page.locator('[data-language="en"]').click();
-  await expect(notice).toContainText('Not executed');
+  await expect(notice).toContainText('Implemented');
   expect(await notice.innerText()).not.toMatch(/[\u3400-\u9fff]/);
   await expect(example).toContainText('Previously unresolved');
   expect(await example.innerText()).not.toMatch(/[\u3400-\u9fff]/);
@@ -126,11 +126,16 @@ test('expanded notebook retains chart controls when restored',async({page},info)
   await page.locator('[data-notebook="5"] .notebook-reader-open').click();
   const card=page.locator('[data-notebook="5"]');
   await expect(card.locator('h3')).toHaveText('异构表格理解与统一提取');
-  await expect(page.locator('#routing-semantic-count')).toHaveText('392,154');
-  await expect(page.locator('#routing-total-count')).toHaveText('14,812,812');
-  await expect(page.locator('#routing-reduction')).toHaveText('97.35%');
-  await expect(page.locator('#gallery-dedup-chart')).toContainText('14,420,658');
-  await expect(card).toContainText('按方案保留复核');
+  const tokens=require('../../showcase/assets/token-comparison.json'),fmt=n=>n.toLocaleString('en-US');
+  await expect(page.locator('#token-note-hybrid')).toHaveText(fmt(tokens.hybrid_input_tokens));
+  await expect(page.locator('#token-note-baseline')).toHaveText(fmt(tokens.all_record_input_tokens));
+  await expect(page.locator('#token-note-ratio')).toHaveText((tokens.input_ratio*100).toFixed(2)+'%');
+  await expect(page.locator('#routing-card-count')).toHaveText(fmt(tokens.card_input_tokens));
+  await expect(page.locator('#routing-semantic-count')).toHaveText(fmt(tokens.semantic_input_tokens));
+  await expect(page.locator('#routing-total-count')).toHaveText(fmt(tokens.all_record_input_tokens));
+  await expect(page.locator('#routing-reduction')).toHaveText((tokens.input_reduction*100).toFixed(2)+'%');
+  await expect(page.locator('#gallery-dedup-chart')).toContainText(fmt(tokens.hybrid_input_tokens));
+  await expect(card).toContainText('1,347＋408');
   await expect(card).not.toContainText('五步处理');
   await card.locator('h3').scrollIntoViewIfNeeded();
   await page.screenshot({path:info.outputPath('field-plan-comparison.png')});
@@ -138,7 +143,7 @@ test('expanded notebook retains chart controls when restored',async({page},info)
   await page.locator('[data-language="en"]').click();
   await page.locator('[data-notebook="5"] .notebook-reader-open').click();
   await expect(card.locator('h3')).toHaveText('Understanding heterogeneous tables and unified extraction');
-  await expect(card).toContainText('97.35%');
+  await expect(card).toContainText((tokens.input_ratio*100).toFixed(2)+'%');
   expect(await card.innerText()).not.toMatch(/[\u3400-\u9fff]/);
   await page.screenshot({path:info.outputPath('field-plan-comparison-english.png')});
   await page.locator('.routing-example').scrollIntoViewIfNeeded();
@@ -599,7 +604,7 @@ test('review gates expose implemented checks, proposed human sampling and a work
  await expect(page.locator('#review-panel-0')).toBeVisible();await expect(section).toContainText('金额与单位');
  await page.locator('[data-review-tab="1"]').click();await expect(page.locator('#review-accounting')).toContainText('43,653,625');
  await page.locator('[data-review-tab="2"]').click();await expect(page.locator('#review-panel-2')).toBeVisible();
- await expect(page.locator('#review-detection')).toHaveText('95.2%');await expect(section).toContainText('尚未执行人工抽查');
+ await expect(page.locator('#review-detection')).toHaveText('95.2%');await expect(section).toContainText('抽查参数配置与检出概率计算');
  await page.locator('#review-error-rate').selectOption('0.05');await expect(page.locator('#review-detection')).toHaveText('>99.9%');
  await page.locator('#review-error-rate').selectOption('0.02');
  await page.locator('#review-sample-n').focus();await page.locator('#review-sample-n').press('End');await expect(page.locator('#review-sample-n-value')).toHaveText('300');
@@ -611,11 +616,36 @@ test('review gates expose implemented checks, proposed human sampling and a work
   await section.screenshot({path:info.outputPath('review-gate-'+i+'.png')});
  }
  await page.locator('[data-language="en"]').click();
- await expect(section).toContainText('Human sampling has not been performed');
+ await expect(section).toContainText('Sampling configuration and detection probability');
  for(const i of [0,1,2,3]){
   await page.locator(`[data-review-tab="${i}"]`).click();
   expect(await page.locator('#review-panel-'+i).innerText()).not.toMatch(/[\u3400-\u9fff]/);
   expect(await page.evaluate(()=>document.documentElement.scrollWidth)).toBeLessThanOrEqual(page.viewportSize().width+1);
   if(i===2)await section.screenshot({path:info.outputPath('review-human-english.png')});
  }
+});
+
+
+test('award example logs exact enum and amount errors then accepts a corrected record',async({page},info)=>{
+ await page.goto('/?lang=zh#review-mechanism');
+ await expect(page.locator('#review-mechanism')).toHaveAttribute('data-ready','true');
+ await expect(page.locator('#review-award-errors')).toContainText('ENUM_NOT_ALLOWED');
+ await expect(page.locator('#review-award-errors')).toContainText('row 14');
+ await page.locator('#review-award-status').selectOption('confirmed');
+ await page.locator('#review-award-amount').fill('待定');
+ await expect(page.locator('#review-award-errors')).toContainText('AMOUNT_NOT_DECIMAL');
+ await page.locator('#review-award-amount').fill('120');
+ await expect(page.locator('#review-award-errors')).toBeHidden();
+ await expect(page.locator('#review-award-outcome')).toHaveAttribute('data-valid','true');
+ await expect(page.locator('#review-award-outcome')).toContainText('生成已中标事件');
+ await page.locator('#review-award-status').selectOption('not_awarded');
+ await page.locator('#review-award-amount').fill('');
+ await expect(page.locator('#review-award-outcome')).toContainText('不生成中标事件');
+ await page.locator('#review-award-status').selectOption('candidate');
+ await page.locator('#review-award-amount').fill('80');
+ await page.locator('#review-panel-0').screenshot({path:info.outputPath('award-rule-errors.png')});
+ await page.locator('[data-language="en"]').click();
+ await expect(page.locator('#review-award-errors')).toContainText('ENUM_NOT_ALLOWED');
+ expect(await page.locator('#review-panel-0').innerText()).not.toMatch(/[\u3400-\u9fff]/);
+ await page.locator('#review-panel-0').screenshot({path:info.outputPath('award-rule-errors-english.png')});
 });
