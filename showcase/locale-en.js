@@ -1145,7 +1145,7 @@
   "逐行校验与报错记录": "Row validation and error records",
   "合成文件演示 · 修改下方原值，可直接观察核验结果": "Synthetic file demo · Edit the raw values to inspect validation results",
   "② 金额与单位": "2. Amounts and units",
-  "本表金额单位固定为万元，单元格须为有限、非负十进制数字。“待定”“约120”“120万元”均报错；不自动删除文字。已中标、拟中标的金额必填；未中标可空，空值不补零。": "Amounts use CNY 10k and must be finite, nonnegative decimals. Text such as 'pending', 'about 120' or '120 ten-thousand yuan' fails validation; text is not silently removed. Amounts are required for awarded or proposed awards, but may be empty for unsuccessful bids. Empty values are not replaced with zero.",
+  "本表金额单位固定为万元，支持阿拉伯数字和中文数字，包括“一百二十”“壹佰贰拾”“十二点五”。保留输入原文，不自动换算单位。“待定”“约120”“120万元”仍报错；已中标、拟中标的金额必填，未中标可空，空值不补零。": "Amounts use CNY 10k. Accept Arabic numerals and Chinese numerals, including ordinary, financial uppercase and decimal forms. Preserve the original input without converting units. Pending values, approximations and repeated unit text still fail. Amounts are required for awarded or proposed awards; unsuccessful bids may leave them empty. Empty values are not replaced with zero.",
   "③ 状态枚举": "3. Allowed statuses",
   "仅允许“已中标／拟中标／未中标”，逐字匹配。已中标 → 已确认事件；拟中标 → 拟议事件；未中标 → 不生成中标事件。“中标候选”等集合外值报错，不自动猜成拟中标。": "Only 'awarded', 'proposed award' and 'not awarded' are accepted by exact match. They map to confirmed, proposed and no award event, respectively. Any other value, such as 'award candidate', raises an error rather than being guessed as a proposed award.",
   "④ 异常去向": "4. Exception routing",
