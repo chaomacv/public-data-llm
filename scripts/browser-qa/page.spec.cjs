@@ -409,6 +409,7 @@ test('lineage decreases from parsed records to exported events while historical 
  if(page.viewportSize().width>1100){await representative.hover();await expect(page.locator('.lineage-tooltip')).toBeVisible();await expect(page.locator('.lineage-tooltip')).toContainText('5,968,620');}
  await page.locator('[data-lineage-point="1"]').click();await expect(chart).toHaveAttribute('data-selected-count','14812812');
  await page.locator('[data-lineage-point="1"]').press('ArrowRight');await expect(chart).toHaveAttribute('data-selected-count','5968620');
+ await page.mouse.move(0,0);
  await page.locator('#lineage-scale').selectOption('linear');await expect(chart).toHaveAttribute('data-selected-count','5968620');
  await page.locator('#lineage-scale').selectOption('log');await representative.click();
  await page.screenshot({path:info.outputPath('lineage-stage-flow.png')});
