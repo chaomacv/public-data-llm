@@ -179,6 +179,8 @@ The JSON/SQLite files below belong to the small-sample workflow. For full-corpus
 
 ## Current boundaries
 
+**Routing update (2026-11-25, not executed):** all 475 previously unresolved processing units now route to complex semantic processing, with original plan reasons, validation errors and quality flags linked to an issue ledger. Together with the original 382 semantic units, the planned total is 857. The page shows this pending change; published result counts still describe the historical batch. [Routing and issue records](docs/review_semantic_routing.md).
+
 - File sampling can miss rare events. Excluded files still need independent sampling and labeled evaluation.
 - Multi-row headers use inspectable heuristics. Excel readers consume cached cell values; complex subtables, formula caches and footnotes need checks. The full pipeline reads documents, necessary OCR, archives, XML and geodatabase attributes; 65 unreliable logical files in this batch remain separate review items.
 - File scanning uses a fixed number of samples. Partitioned JSONL and disk-based DuckDB aggregation support the full batch, but larger scales require fresh resource and quality checks.

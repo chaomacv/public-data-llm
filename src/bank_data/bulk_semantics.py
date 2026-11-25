@@ -211,7 +211,8 @@ def finalize_validation(profiles,root):
                     seen.add(rid);statuses[result['status']]+=1;methods[method]+=1
                     trace={k:task.get(k) for k in TRACE_FIELDS}
                     provenance={key:saved[key] for key in ['model_provenance','strategy_signature','representative_record_id','content_key'] if key in saved}
-                    write_line(streams['record_results'],{**trace,**result,'method':method,'reason':saved['errors'],**provenance})
+                    routing={'routing_issue_id':task['routing_issue_id']} if task.get('routing_issue_id') else {}
+                    write_line(streams['record_results'],{**trace,**result,'method':method,'reason':saved['errors'],**provenance,**routing})
                     mentions,events=derived(result,trace,(saved.get('model_provenance') or {}).get('entity_kinds',[]))
                     for item in mentions:write_line(streams['mentions'],item)
                     for item in events:write_line(streams['events'],item)

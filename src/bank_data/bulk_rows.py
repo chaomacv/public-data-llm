@@ -14,6 +14,7 @@ from .subject_guards import ORG_MARKERS,recognizable_organization
 
 EMPTY={'','-','--','—','/','null','none','nan','暂无','不详','无'}
 TRACE_FIELDS=['file_id','root_file_id','scope_id','sheet','row','source_quality','source_kind','ocr_min_confidence']
+REVIEW_ROUTING_POLICY='review-plan-to-record-semantics-v1'
 
 
 def empty(value):return value is None or str(value).strip().casefold() in EMPTY
@@ -37,7 +38,7 @@ def condition(item,row):
 def apply_plan(row,card,plan):
     rid=row['record_id'];mode=plan['mode']
     if mode=='row_llm':return None,'requires_record_semantics',[]
-    if mode=='review':return review_result(rid),'unresolved_file_mapping',[]
+    if mode=='review':return None,'review_plan_requires_record_semantics',[]
     if mode=='exclude':return {'record_id':rid,'status':'NO_EVENT','entities':[],'events':[]},'plan_excluded',[]
     entities=[];slots={};kinds=[]
     for index,mapping in enumerate(plan['entities']):
@@ -115,9 +116,10 @@ def materialize_file(args):
     profile,root=args;root=Path(root);fid=profile['file_id']
     rawdir=root/'05_records'/fid;outdir=root/'06_validation'/fid
     rawdir.mkdir(parents=True,exist_ok=True);outdir.mkdir(parents=True,exist_ok=True)
-    cards={c['scope_id']:c for c in profile['cards']};plans={};signatures={}
+    cards={c['scope_id']:c for c in profile['cards']};plans={};signatures={};routing_issues={}
     for scope,card in cards.items():
         saved=root/'04_plans/scopes'/(scope+'.json')
+        data={}
         if saved.exists():
             data=json.loads(saved.read_text(encoding='utf-8'));plans[scope]=data['plan'];signatures[scope]=data['signature']
         else:
@@ -125,7 +127,20 @@ def materialize_file(args):
             excluded=decision.exists() and json.loads(decision.read_text(encoding='utf-8'))['decision']['decision']=='DROP'
             plans[scope]={'mode':'exclude' if excluded else 'review',
                 'reason':'screen_excluded' if excluded else 'missing_field_plan','entities':[],'events':[]}
-    key=stable_id('materializer-v3-subject-guard',file_hash(__file__),file_hash(subject_guards.__file__),fid,plans,signatures)
+        if plans[scope]['mode']=='review':
+            problem={'policy':REVIEW_ROUTING_POLICY,'file_id':fid,'root_file_id':profile.get('root_file_id') or fid,
+                'scope_id':scope,'sheet':card.get('sheet'),'original_plan_mode':'review','destination':'row_llm',
+                'original_reason':plans[scope].get('reason'),'planner_error':data.get('error'),
+                'quality_flags':card.get('quality_flags',profile.get('quality_flags',[])),
+                'plan_signature':signatures.get(scope),'plan_path':str(saved),
+                'card_hash':stable_id(card),'execution_status':'awaiting_readable_records'}
+            routing_issues[scope]={'issue_id':stable_id(REVIEW_ROUTING_POLICY,problem),**problem}
+    # Persist the original uncertainty even if subsequent source reading fails.
+    issue_path=outdir/'review_routing_issues.jsonl'
+    with issue_path.with_suffix('.jsonl.part').open('wb') as stream:
+        for issue in routing_issues.values():write_line(stream,issue)
+    issue_path.with_suffix('.jsonl.part').replace(issue_path)
+    key=stable_id('materializer-v4-review-semantics',file_hash(__file__),file_hash(subject_guards.__file__),fid,plans,signatures,routing_issues)
     prior=outdir/'mapping_summary.json'
     if prior.exists():
         value=json.loads(prior.read_text(encoding='utf-8'))
@@ -138,7 +153,7 @@ def materialize_file(args):
     outputs={'raw':rawdir/'rows.jsonl','chunks':rawdir/'chunks.jsonl','draft':outdir/'mapped_results.jsonl',
         'mentions':outdir/'mapped_mentions.jsonl','events':outdir/'mapped_events.jsonl','pending':outdir/'pending_llm.jsonl'}
     streams={k:p.with_name(p.name+'.part').open('wb') for k,p in outputs.items()}
-    statuses=Counter();seen=Counter();contexts={};chunk=[];excluded=0;pending=0;raw_count=0
+    statuses=Counter();seen=Counter();contexts={};chunk=[];excluded=0;pending=0;raw_count=0;review_routed=0
     start=time.monotonic()
     try:
         for sheet,ordinal,cells,context in read_records(Path(profile['path']),profile['kind']):
@@ -160,7 +175,10 @@ def materialize_file(args):
             try:result,reason,kinds=apply_plan(row,card,plan)
             except Exception as error:result,reason,kinds=review_result(rid),type(error).__name__+': '+str(error)[:160],[]
             if result is None:
-                pending+=1;write_line(streams['pending'],{**trace,'record_id':rid,'raw_offset':offset,'reason':reason})
+                pending+=1;issue=routing_issues.get(scope)
+                routing={'routing_issue_id':issue['issue_id']} if issue else {}
+                if issue:review_routed+=1
+                write_line(streams['pending'],{**trace,'record_id':rid,'raw_offset':offset,'reason':reason,**routing})
             else:
                 statuses[result['status']]+=1
                 write_line(streams['draft'],{**trace,**result,'method':'llm_field_plan','plan_signature':signatures.get(scope),'reason':reason})
@@ -176,7 +194,8 @@ def materialize_file(args):
         dump(rawdir/'contexts.json',contexts)
         value={'file_id':fid,'key':key,'status':'MAPPED','expected_records':profile['records'],'raw_records':raw_count,
             'mapped_records':sum(statuses.values()),'record_statuses':dict(statuses),'pending_llm':pending,
-            'excluded_records':excluded,'seconds':round(time.monotonic()-start,2)}
+            'excluded_records':excluded,'review_routed_records':review_routed,'review_routed_scopes':len(routing_issues),
+            'routing_policy':REVIEW_ROUTING_POLICY,'seconds':round(time.monotonic()-start,2)}
         dump(prior,value);return value
     finally:
         for stream in streams.values():stream.close()
@@ -203,6 +222,14 @@ def materialize(profiles,root,workers=6):
     summary={'complete':True,'files':len(results),'file_statuses':dict(Counter(v['status'] for v in results)),
         'raw_records':sum(v.get('raw_records',0) for v in results),'mapped_records':sum(v.get('mapped_records',0) for v in results),
         'pending_llm':sum(v.get('pending_llm',0) for v in results),'excluded_records':sum(v.get('excluded_records',0) for v in results),
-        'seconds':round(time.monotonic()-start,2)}
+        'review_routed_records':sum(v.get('review_routed_records',0) for v in results),
+        'review_routed_scopes':sum(v.get('review_routed_scopes',0) for v in results),
+        'routing_policy':REVIEW_ROUTING_POLICY,'seconds':round(time.monotonic()-start,2)}
+    issue_index=root/'06_validation/review_routing_issues.jsonl'
+    with issue_index.with_suffix('.jsonl.part').open('wb') as stream:
+        for profile in profiles:
+            issues=root/'06_validation'/profile['file_id']/'review_routing_issues.jsonl'
+            if profile['cards'] and issues.exists():stream.write(issues.read_bytes())
+    issue_index.with_suffix('.jsonl.part').replace(issue_index)
     dump(root/'06_validation/mapping_files.json',results);dump(root/'06_validation/mapping_summary.json',summary)
     return results

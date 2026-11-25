@@ -61,14 +61,21 @@
     $('html-story-example').textContent=text?'合成HTML有限公司已处罚，罚款100元。':'<p class="notice">合成<span>HTML</span>有限公司已处罚，罚款100元。</p>';
     document.querySelectorAll('[data-html-view]').forEach(item=>item.setAttribute('aria-pressed',String(item===button)));
   }));
-  Promise.all(['run-summary.json','data-lineage.json'].map(name=>fetch('assets/'+name+'?v=review-20261124').then(response=>{
+  Promise.all(['run-summary.json','data-lineage.json','routing-update.json'].map(name=>fetch('assets/'+name+'?v=review-routing-20261125').then(response=>{
     if(!response.ok)throw new Error('Aggregate snapshot unavailable');return response.json();
-  }))).then(([data,flow])=>{
+  }))).then(([data,flow,routing])=>{
     lineage=window.BEILineage.validate(flow);
     if(lineage.counts.known!==data.input.known_logical_records||lineage.counts.retained!==data.preparation.retained_records)throw Error('Lineage snapshot mismatch');
     if(data.kind!=='aggregate_run_snapshot'||data.semantic_accuracy_evaluated!==false||!['running','completed','completed_with_review'].includes(data.pipeline_status))throw new Error('Unexpected snapshot provenance');
     if(data.pipeline_status.startsWith('completed')&&(!data.validation?.final_audit_passed||!data.final_counts))throw new Error('Final counts require completed audit');
     snapshot=data;const done=data.pipeline_status.startsWith('completed');
+    if(routing.kind!=='routing_policy_update'||routing.status!=='not_executed'||routing.historical_results_unchanged!==true||
+       routing.affected_processing_units!==data.plans.review||routing.historical_semantic_units!==data.plans.row_llm||
+       routing.planned_semantic_units!==data.plans.review+data.plans.row_llm)throw Error('Routing update mismatch');
+    $('run-routing-count').textContent=format(routing.affected_processing_units);
+    $('run-routing-original').textContent=format(routing.historical_semantic_units);
+    $('run-routing-planned').textContent=format(routing.planned_semantic_units);
+    $('run-routing-update').dataset.ready='true';
     $('run-overall-state').textContent=done?'本批流程已完成，含待复核结果':'本批全量抽取进行中';
     $('run-overall-state').dataset.state=done?'complete':'running';
     $('run-snapshot-date').textContent='固定输入 / '+data.snapshot_date+' · 汇总更新 / '+data.updated_at;

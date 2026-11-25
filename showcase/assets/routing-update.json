@@ -1,0 +1,13 @@
+{
+  "schema_version": 1,
+  "kind": "routing_policy_update",
+  "policy": "review-plan-to-record-semantics-v1",
+  "status": "not_executed",
+  "planned_on": "2026-11-25",
+  "original_mode": "review",
+  "destination": "row_llm",
+  "affected_processing_units": 475,
+  "historical_semantic_units": 382,
+  "planned_semantic_units": 857,
+  "historical_results_unchanged": true
+}

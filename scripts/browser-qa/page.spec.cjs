@@ -11,6 +11,28 @@ test.beforeEach(async({page})=>{
     return [...document.fonts].some(f=>f.family.replace(/["']/g,'')==='PublicData Sans SC'&&f.status==='loaded');
   })).toBe(true);
 });
+
+test('pending review routing is visible in both languages without changing history',async({page},info)=>{
+  const notice=page.locator('#run-routing-update');
+  await expect(notice).toHaveAttribute('data-ready','true');
+  await notice.scrollIntoViewIfNeeded();
+  await expect(notice).toContainText('尚未执行');
+  await expect(page.locator('#run-routing-count')).toHaveText('475');
+  await expect(page.locator('#run-routing-original')).toHaveText('382');
+  await expect(page.locator('#run-routing-planned')).toHaveText('857');
+  await page.locator('[data-run-step="3"]').click();
+  const example=page.locator('[data-plan-mode="review"]');
+  await expect(example).toContainText('原待复核 → 复杂语义');
+  await expect(example).toContainText('尚未执行');
+  await page.screenshot({path:info.outputPath('review-routing-pending.png')});
+  await page.locator('[data-language="en"]').click();
+  await expect(notice).toContainText('Not executed');
+  expect(await notice.innerText()).not.toMatch(/[\u3400-\u9fff]/);
+  await expect(example).toContainText('Previously unresolved');
+  expect(await example.innerText()).not.toMatch(/[\u3400-\u9fff]/);
+  await notice.scrollIntoViewIfNeeded();
+  await page.screenshot({path:info.outputPath('review-routing-pending-english.png')});
+});
 async function measure(page){
   return page.locator('#gallery-viewport').evaluate(el=>{
     const box=el.getBoundingClientRect(),cards=[...el.querySelectorAll('[data-notebook]')].map(c=>c.getBoundingClientRect());
