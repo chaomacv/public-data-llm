@@ -295,7 +295,7 @@ test('review calculator states explicit assumptions and the flow only decreases 
  assert.equal(r.detectionProbability(150,0),0);assert.equal(r.detectionProbability(150,1),1);
  assert.ok(r.detectionProbability(300,.02)>r.detectionProbability(150,.02));
  for(const args of [[0,.02],[10,-.1],[10,1.1],[1.5,.02]])assert.throws(()=>r.detectionProbability(...args));
- assert.equal(r.nextTab(3,'ArrowRight'),0);assert.equal(r.nextTab(0,'ArrowLeft'),3);assert.equal(r.nextTab(1,'End'),3);
+ assert.equal(r.nextTab(4,'ArrowRight'),0);assert.equal(r.nextTab(0,'ArrowLeft'),4);assert.equal(r.nextTab(1,'End'),4);
  assert.ok(d.flow_points.every((p,i)=>!i||p.count<=d.flow_points[i-1].count));
  const bad=structuredClone(d);bad.flow_points.reverse();assert.throws(()=>m.validate(bad));
  const run=require('../showcase/run-visual.js'),snapshot=require('../showcase/assets/run-summary.json');
@@ -304,7 +304,7 @@ test('review calculator states explicit assumptions and the flow only decreases 
  const html=fs.readFileSync(require('node:path').join(__dirname,'../showcase/index.html'),'utf8');
  assert.ok(html.indexOf('id="review-mechanism"')>html.indexOf('id="pipeline"'));
  assert.ok(html.indexOf('id="review-mechanism"')<html.indexOf('id="field-notes"'));
- for(const key of ['抽查参数配置与检出概率计算','新随机样本复验','最多两轮','不是NIST规定','pmc232.htm','NIST.AI.600-1.pdf'])assert.ok(html.includes(key));
+ for(const key of ['抽查参数配置与检出概率计算','新随机样本','不是NIST规定','pmc232.htm','NIST.AI.600-1.pdf'])assert.ok(html.includes(key));
 });
 
 test('review-unit routing update is pending and never rewrites historical result counts',()=>{
@@ -349,4 +349,13 @@ test('amount validation accepts Chinese numeric forms while retaining raw text',
  for(const value of ['负一百','一百万元','大约一百','一百百','十十','一万万','十二点','零十','一百点五十','一百公司']){
   assert.equal(isAmount(value),false,value);assert.equal(validateAward({amount:value,status:'已中标'}).errors[0].code,'AMOUNT_NOT_DECIMAL');
  }
+});
+
+
+test('external sampling escalation redoes the whole unit and ends in human review',()=>{
+ const {reviewRoute}=require('../showcase/review.js');
+ assert.deepEqual(reviewRoute('pass','fail'),['external_sample','human_sample']);
+ assert.deepEqual(reviewRoute('fail','pass'),['external_sample','main_redo_unit','external_resample','human_sample']);
+ assert.deepEqual(reviewRoute('fail','fail'),['external_sample','main_redo_unit','external_resample','external_redo_unit','human_review_unit']);
+ assert.throws(()=>reviewRoute('unknown','pass'));
 });
