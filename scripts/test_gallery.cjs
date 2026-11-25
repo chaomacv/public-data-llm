@@ -338,3 +338,15 @@ test('award rules enforce a numeric amount and the exact three-state domain',()=
  assert.equal(validateAward({amount:'',status:'拟中标'}).errors[0].code,'AMOUNT_REQUIRED');
  assert.equal(validateAward({amount:'0',status:'已中标'}).errors.length,0);
 });
+
+
+test('amount validation accepts Chinese numeric forms while retaining raw text',()=>{
+ const {validateAward,isAmount}=require('../showcase/review.js');
+ for(const value of ['零','〇','十','百','千','万','亿','万亿','一二〇','十二','一百二十','壹佰贰拾','两百','十二点五','壹佰贰拾点伍','一千零五','一万零三','一亿零二百万','一万亿']){
+  assert.equal(isAmount(value),true,value);const row={amount:value,status:'已中标'};
+  assert.equal(validateAward(row).action,'confirmed',value);assert.equal(row.amount,value);
+ }
+ for(const value of ['负一百','一百万元','大约一百','一百百','十十','一万万','十二点','零十','一百点五十','一百公司']){
+  assert.equal(isAmount(value),false,value);assert.equal(validateAward({amount:value,status:'已中标'}).errors[0].code,'AMOUNT_NOT_DECIMAL');
+ }
+});

@@ -639,6 +639,11 @@ test('award example logs exact enum and amount errors then accepts a corrected r
  await expect(page.locator('#review-award-errors')).toBeHidden();
  await expect(page.locator('#review-award-outcome')).toHaveAttribute('data-valid','true');
  await expect(page.locator('#review-award-outcome')).toContainText('生成已中标事件');
+ for(const amount of ['一百二十','壹佰贰拾','十二点五']){
+  await page.locator('#review-award-amount').fill(amount);
+  await expect(page.locator('#review-award-outcome')).toHaveAttribute('data-valid','true');
+  await expect(page.locator('#review-award-amount')).toHaveValue(amount);
+ }
  await page.locator('#review-award-status').selectOption('not_awarded');
  await page.locator('#review-award-amount').fill('');
  await expect(page.locator('#review-award-outcome')).toContainText('不生成中标事件');

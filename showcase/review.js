@@ -14,12 +14,42 @@
   return null;
  }
  const awardStates=['已中标','拟中标','未中标'];
+ // Recognize numeric text without converting or overwriting the source value.
+ function isChineseNumber(value){
+  const variants={'〇':'零','两':'二','兩':'二','壹':'一','贰':'二','貳':'二','叁':'三','參':'三','肆':'四','伍':'五','陆':'六','陸':'六','柒':'七','捌':'八','玖':'九','拾':'十','佰':'百','仟':'千','萬':'万','億':'亿','點':'点'};
+  const s=[...value].map(c=>variants[c]||c).join('');
+  if(!/^[零一二三四五六七八九十百千万亿点]+$/.test(s))return false;
+  const parts=s.split('点');if(parts.length>2||parts.length===2&&!/^[零一二三四五六七八九]+$/.test(parts[1]))return false;
+  function small(text){
+   if(!text)return false;
+   if(/^[零一二三四五六七八九]+$/.test(text))return true;
+   let last=10000,digit=false,zero=false;
+   for(let i=0;i<text.length;i++){
+    const c=text[i],unit={十:10,百:100,千:1000}[c];
+    if(unit){if(unit>=last||(!digit&&i!==0)||zero)return false;last=unit;digit=false;}
+    else if(c==='零'){if(i===0||i===text.length-1||zero||digit)return false;zero=true;}
+    else {if(digit)return false;digit=true;zero=false;}
+   }
+   return true;
+  }
+  function group(text,unit,lower){
+   if(text===unit)return true;
+   const p=text.split(unit);if(p.length===1)return lower(text);if(p.length!==2||!p[0]||/^零+$/.test(p[0])||!lower(p[0]))return false;
+   if(!p[1])return true;
+   const tail=p[1].replace(/^零/,'');return !!tail&&lower(tail);
+  }
+  const wan=t=>group(t,'万',small);
+  return parts[0]?group(parts[0],'亿',wan):parts.length===2;
+ }
+ function isAmount(value){
+  return /^(?:\d+(?:\.\d*)?|\.\d+)$/.test(value)&&Number.isFinite(Number(value))||isChineseNumber(value);
+ }
  function validateAward(row){
   const errors=[],status=String(row.status??''),amount=String(row.amount??'').trim();
   if(!awardStates.includes(status))errors.push({field:'award_status',code:'ENUM_NOT_ALLOWED',value:status,rule:'STATUS_ENUM_V1'});
   if(!amount){
    if(status!=='未中标')errors.push({field:'award_amount',code:'AMOUNT_REQUIRED',value:amount,rule:'AMOUNT_REQUIRED_V1'});
-  }else if(!/^(?:\d+(?:\.\d*)?|\.\d+)$/.test(amount)||!Number.isFinite(Number(amount))){
+  }else if(!isAmount(amount)){
    errors.push({field:'award_amount',code:'AMOUNT_NOT_DECIMAL',value:amount,rule:'AMOUNT_DECIMAL_V1'});
   }
   return {errors,action:errors.length?'complex_semantic':status==='已中标'?'confirmed':status==='拟中标'?'proposed':'no_event'};
@@ -47,5 +77,5 @@
   $('review-accounting').innerHTML=rows.map(([label,total,parts])=>'<div><span>'+label+'</span><strong>'+fmt(total)+'</strong><small>= '+parts.map(fmt).join(' + ')+'</small></div>').join('');
   section.dataset.ready='true';
  }
- return {detectionProbability,nextTab,validateAward,mount};
+ return {detectionProbability,nextTab,isChineseNumber,isAmount,validateAward,mount};
 });
