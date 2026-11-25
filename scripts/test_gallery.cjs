@@ -359,3 +359,49 @@ test('external sampling escalation redoes the whole unit and ends in human revie
  assert.deepEqual(reviewRoute('fail','fail'),['external_sample','main_redo_unit','external_resample','external_redo_unit','human_review_unit']);
  assert.throws(()=>reviewRoute('unknown','pass'));
 });
+
+test('harness scenarios gate release, bound reprocessing and preserve versioned receipts',()=>{
+ const h=require('../showcase/agent-harness.js');
+ for(const [scenario,revision,retries] of [['normal',1,0],['retry',2,1],['escalate',3,2]]){
+  const state=h.runScenario(scenario);assert.equal(state.phase,'released');assert.equal(state.revision,revision);
+  assert.equal(state.retries.main+state.retries.independent,retries);
+  assert.equal(state.checks.human,revision);assert.equal(state.checks.evidence,revision);
+  assert.equal(new Set(state.selected).size,state.selected.length);
+  assert.equal(state.journal.at(-1).code,'RELEASED');
+ }
+ const counts=h.runScenario('counts');assert.equal(counts.phase,'blocked');
+ assert.equal(counts.journal.at(-1).code,'ACCOUNTING_MISMATCH');
+ assert.ok(!counts.journal.some(r=>r.tool==='review_with_model'||r.tool==='release_unit'));
+ const human=h.runScenario('human');assert.equal(human.phase,'held');assert.equal(human.checks.human,null);
+ assert.ok(!human.journal.some(r=>r.tool==='release_unit'));
+ const stale=h.runScenario('stale');assert.equal(stale.phase,'blocked');assert.equal(stale.journal.at(-1).code,'STALE_OR_FOREIGN_REVISION');
+ assert.equal(stale.journal.at(-1).requested_revision,1);assert.equal(stale.revision,2);
+});
+
+test('harness rejects premature release, duplicate-call conflicts and exhausted retry budgets',()=>{
+ const h=require('../showcase/agent-harness.js'),unit=h.createUnit();
+ const call=(state,tool,input={},id='call-1')=>({unit_id:state.unit_id,revision:state.revision,input_signature:state.input_signature,plan_signature:state.plan_signature,call_id:id,tool,input});
+ assert.equal(h.executeTool(unit,call(unit,'release_unit')).receipt.code,'RELEASE_GATES_NOT_MET');
+ assert.equal(h.executeTool(unit,{...call(unit,'release_unit'),plan_signature:'wrong-plan'}).receipt.code,'SIGNATURE_MISMATCH');
+ const packet=call(unit,'expand_file_card',{additional:12,seed:43});
+ const first=h.executeTool(unit,packet);assert.equal(first.state.selected.length,27);assert.equal(unit.selected.length,15);
+ const again=h.executeTool(first.state,packet);assert.equal(again.cached,true);assert.equal(again.state.journal.length,1);
+ assert.equal(h.executeTool(first.state,{...packet,input:{additional:24,seed:43}}).receipt.code,'IDEMPOTENCY_CONFLICT');
+ const full=h.executeTool(first.state,call(first.state,'expand_file_card',{additional:120,seed:44},'call-2'));
+ assert.equal(full.state.selected.length,120);assert.equal(new Set(full.state.selected).size,120);
+ const released=h.runScenario('escalate');
+ for(const actor of ['main','independent'])assert.equal(h.executeTool(released,call(released,'redo_unit',{actor})).receipt.code,'RETRY_BUDGET_EXHAUSTED');
+ const human=call(released,'request_human_review',{task_ref:'demo://synthetic-unit-A/r3/human-review-task'});
+ assert.equal(h.executeTool(released,human,{revision:3,decision:'pass',receipt:''}).receipt.code,'HUMAN_RECEIPT_REQUIRED');
+ assert.equal(h.executeTool(released,{...human,input:{...human.input,decision:'pass'}}).receipt.code,'INVALID_ARGUMENT');
+ assert.equal(h.executeTool(released,human).receipt.code,'CURRENT_TOOL_RECEIPT_REQUIRED');
+ assert.equal(h.executeTool(unit,call(unit,'expand_file_card',{additional:-1,seed:42})).receipt.code,'INVALID_ARGUMENT');
+});
+
+test('reprocessing a unit invalidates every previous check before the new revision can release',()=>{
+ const h=require('../showcase/agent-harness.js');let state=h.runScenario('retry');
+ function run(tool,input,observation){const x=h.executeTool(state,{unit_id:state.unit_id,revision:state.revision,input_signature:state.input_signature,plan_signature:state.plan_signature,call_id:'new-'+tool,tool,input},observation?{...observation,revision:state.revision}:undefined);state=x.state;return x.receipt;}
+ run('review_with_model',{sample_ref:'demo://synthetic-unit-A/card/v4',model_role:'independent'},{outcome:'fail'});run('redo_unit',{actor:'independent'});
+ assert.equal(state.revision,3);assert.ok(Object.values(state.checks).every(v=>v===null));
+ assert.equal(run('release_unit',{}).code,'RELEASE_GATES_NOT_MET');
+});
