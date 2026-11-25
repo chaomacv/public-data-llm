@@ -41,6 +41,42 @@ async function measure(page){
     return {full,partial,left:box.left,right:box.right,window:innerWidth,cardWidth:cards[0].width,pageWidth:document.documentElement.scrollWidth};
   });
 }
+
+test('review rounds expand the file card without replacing samples in either language',async({page},info)=>{
+  await page.locator('#lab').scrollIntoViewIfNeeded();
+  await expect(page.locator('#sample-selected')).toHaveText('15');
+  const samples=()=>page.locator('#sample-grid .sample-cell').evaluateAll(cells=>cells.flatMap((c,i)=>c.classList.length>1?[[i,c.className]]:[]));
+  const baseline=await samples();
+  await page.locator('#sample-review-stage').selectOption('1');
+  await expect(page.locator('#sample-selected')).toHaveText('27');
+  await expect(page.locator('#sample-review-added')).toHaveText('12');
+  const external=await samples();
+  for(const row of baseline)expect(external).toContainEqual(row);
+  await page.locator('#sample-review-stage').selectOption('2');
+  await expect(page.locator('#sample-selected')).toHaveText('51');
+  await expect(page.locator('#sample-review-added')).toHaveText('36');
+  await expect(page.locator('#sample-card-total')).toHaveText('51');
+  const human=await samples();
+  for(const row of external)expect(human).toContainEqual(row);
+  await expect(page.locator('#sample-grid .external')).toHaveCount(12);
+  await expect(page.locator('#sample-grid .human')).toHaveCount(24);
+  await page.locator('#panel-sample').screenshot({path:info.outputPath('review-card-supplement.png')});
+  await page.locator('[data-language="en"]').click();
+  await expect(page.locator('#sample-review-stage')).toContainText('Human review');
+  expect(await page.locator('#panel-sample').innerText()).not.toMatch(/[\u3400-\u9fff]/);
+  await page.locator('#sample-review-stage').selectOption('0');
+  await expect(page.locator('#sample-selected')).toHaveText('15');
+  await page.locator('[data-review-tab="2"]').click();
+  await page.locator('[data-sample-review="1"]').click();
+  await expect(page.locator('#sample-review-stage')).toHaveValue('1');
+  await expect(page.locator('#sample-selected')).toHaveText('27');
+  await page.locator('[data-review-tab="3"]').click();
+  await page.locator('[data-sample-review="2"]').click();
+  await expect(page.locator('#sample-selected')).toHaveText('51');
+  expect(await page.locator('#panel-sample').innerText()).not.toMatch(/[\u3400-\u9fff]/);
+  await page.locator('[data-language="zh"]').click();
+  await expect(page.locator('#sample-review-stage')).toContainText('人工审查');
+});
 test('bounded viewport shows three full desktop cards with clipped neighbors',async({page},info)=>{
   await page.locator('#explorations').scrollIntoViewIfNeeded();
   await expect.poll(async()=>(await measure(page)).full).toBe(page.viewportSize().width>1100?3:1);

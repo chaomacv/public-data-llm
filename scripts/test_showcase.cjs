@@ -25,6 +25,23 @@ test('small samples deduplicate overlapping head, middle and tail', () => {
   assert.throws(() => sampleRows(0, 3), RangeError);
 });
 
+test('review supplements preserve earlier card samples, add unseen rows and stop at the unit size', () => {
+  for (const total of [1, 5, 19, 120]) for (const count of [1, 3, 10]) for (const random of [false, true]) {
+    let previous = sampleRows(total, count, random);
+    for (const [stage, added, kind] of [[1, 12, 'external'], [2, 24, 'human']]) {
+      const current = sampleRows(total, count, random, stage);
+      assert.equal(current.size, Math.min(total, previous.size + added));
+      for (const [id, label] of previous) assert.equal(current.get(id), label);
+      for (const [id, label] of current) if (!previous.has(id)) assert.equal(label, kind);
+      assert.deepEqual(current, sampleRows(total, count, random, stage));
+      previous = current;
+    }
+  }
+  assert.equal(sampleRows(120, 3, true, 1).size, 27);
+  assert.equal(sampleRows(120, 3, true, 2).size, 51);
+  assert.throws(() => sampleRows(120, 3, true, 3), RangeError);
+});
+
 test('changing chunk boundaries never loses or repeats a record', () => {
   const rows = Array.from({length: 12}, (_, id) => ({id}));
   for (let size = 2; size <= 6; size++) {
