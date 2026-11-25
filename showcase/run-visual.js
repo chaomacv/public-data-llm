@@ -60,7 +60,7 @@
     ['map','程序提取','<div class="run-plan-mapping"><span>单位名称</span><i aria-hidden="true">→</i><span>企业名称</span><span>决定日期</span><i aria-hidden="true">→</i><span>事件日期</span></div>','字段理解一次，程序逐行引用原值。'],
     ['entity_only','仅主体信息','<p class="run-plan-sample">企业名称 · 地址 · 信用代码</p>','保留主体资料，不生成事件。'],
     ['row_llm','模型逐条理解','<p class="run-plan-sample">甲公司拟获支持；乙公司已获批准。</p><div class="run-plan-stages"><span>甲：拟议</span><span>乙：已确认</span></div>','结合语义，区分主体与事件阶段。'],
-    ['review','原待复核 → 复杂语义','<p class="run-plan-sample">“名称”列：企业？项目？</p><span class="routing-pending">路由已更新 · 尚未执行</span>','转入模型逐条理解，原原因和质量问题保留。']
+    ['review','原待复核 → 复杂语义','<p class="run-plan-sample">“名称”列：企业？项目？</p><span class="routing-pending">已实现 · 复杂语义后备通道</span>','转入模型逐条理解，原原因和质量问题保留。']
    ];
    return heading('四类处理方式，四个小例子','说明示例')+'<div class="run-plan-examples">'+examples.map(([mode,title,example,caption])=>'<section class="run-plan-example" data-plan-mode="'+mode+'"><div class="run-plan-example-heading"><h4>'+title+'</h4><span>'+fmt(d.plans[mode])+'</span></div>'+example+'<p class="run-plan-caption">'+caption+'</p></section>').join('')+'</div>';
   }

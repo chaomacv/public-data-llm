@@ -17,15 +17,11 @@
   const text = (x,y,s,attrs='') => `<text x="${x}" y="${y}" ${attrs}>${esc(s)}</text>`;
   const svg = (body, label, width=720, height=340) => `<svg viewBox="0 0 ${width} ${height}" role="img" aria-label="${esc(label)}"><title>${esc(label)}</title>${body}</svg>`;
 
-  function fieldPlanComparison(data) {
-    const total=data.subset.records,semantic=data.dedup.source_records;
-    if(![total,semantic].every(Number.isSafeInteger)||total<=0||semantic<0||semantic>total)throw Error('Invalid field-plan comparison');
-    const planned=total-semantic;
-    return {total,semantic,planned,reduction:planned/total};
-  }
-  function routingLayout(total,semantic) {
-    const semanticHeight=200*semantic/total;
-    return {semanticHeight,plannedHeight:200-semanticHeight,plannedTop:100+semanticHeight};
+  function tokenComparison(data) {
+    const {card_input_tokens:cards,semantic_input_tokens:semantic,hybrid_input_tokens:hybrid,all_record_input_tokens:baseline}=data;
+    if(data.method!=='uniform_single_record_input_v1'||![cards,semantic,hybrid,baseline].every(Number.isSafeInteger)||
+       cards<0||semantic<0||baseline<=0||hybrid!==cards+semantic)throw Error('Invalid token comparison');
+    return {cards,semantic,hybrid,baseline,ratio:hybrid/baseline,reduction:1-hybrid/baseline};
   }
 
   function eventGroups(rows, state='all') {
@@ -58,10 +54,12 @@
   }
   async function mount(win) {
     const doc=win.document, $=id=>doc.getElementById(id);
-    const response=await win.fetch('assets/gallery-data.json');
-    if (!response.ok) throw new Error('AggregateFetchFailed');
-    const data=await response.json();
+    const [data,tokenData]=await Promise.all(['gallery-data.json','token-comparison.json'].map(async name=>{
+      const response=await win.fetch('assets/'+name+'?v=token-routing-20261125');
+      if(!response.ok)throw Error('AggregateFetchFailed');return response.json();
+    }));
     if (data.kind!=='aggregate_notebook_gallery' || data.final_pipeline_complete!==true || data.subset.partial_only!==false) throw new Error('AggregateScopeMismatch');
+    if(tokenData.kind!=='token_routing_comparison'||tokenData.retained_records!==data.subset.records)throw Error('TokenScopeMismatch');
     doc.querySelectorAll('.gallery-code code').forEach(block=>{
       block.innerHTML=block.textContent.split('\n').map(line=>line.trimStart().startsWith('#')?`<span class="syntax-comment">${esc(line)}</span>`:esc(line).replace(/\b(SELECT|FROM|GROUP BY|AS|if|elif|else|for|in)\b/g,'<span class="syntax-keyword">$1</span>')).join('\n');
     });
@@ -93,18 +91,19 @@
     $('gallery-taxonomy-categories').textContent=eventGroups(data.events).length;
     renderEvents();
 
-    const comparison=fieldPlanComparison(data),{total,semantic,planned}=comparison;
-    const {semanticHeight,plannedHeight,plannedTop}=routingLayout(total,semantic);
+    const comparison=tokenComparison(tokenData),{cards:cardTokens,semantic,hybrid,baseline,ratio,reduction}=comparison;
+    const scale=640/Math.max(baseline,hybrid);
     $('gallery-dedup-chart').innerHTML=svg(
-      text(40,28,'全部逐条交给LLM','class="svg-muted"')+text(40,66,number(total),'class="svg-stat"')+
-      `<path d="M60 100C280 100 390 60 590 60L590 ${60+semanticHeight}C390 ${60+semanticHeight} 280 ${100+semanticHeight} 60 ${100+semanticHeight}Z" fill="#4269d0" opacity=".78"/>`+
-      `<path d="M60 ${100+semanticHeight}C280 ${100+semanticHeight} 390 ${plannedTop} 590 ${plannedTop}L590 ${plannedTop+plannedHeight}C390 ${plannedTop+plannedHeight} 280 300 60 300Z" fill="#bdd0f5"/>`+
-      `<rect x="40" y="100" width="20" height="200" fill="#18233a"/><rect x="590" y="60" width="13" height="${semanticHeight}" fill="#4269d0"/><rect x="590" y="${plannedTop}" width="13" height="${plannedHeight}" fill="#a4bbe9"/>`+
-      text(350,47,number(semantic),'class="svg-stat"')+text(350,88,'逐条语义处理 · '+(semantic/total*100).toFixed(2)+'%','class="svg-muted"')+
-      text(350,284,number(planned),'class="svg-stat"')+text(350,329,'字段方案分流 · 含待复核','class="svg-muted"'),
-      '同一批保留记录：逐条语义处理与字段方案分流，色带宽度按记录数量绘制');
-    $('routing-semantic-count').textContent=number(semantic);$('routing-total-count').textContent=number(total);
-    $('routing-reduction').textContent=(comparison.reduction*100).toFixed(2)+'%';
+      text(40,25,'全部记录逐条理解','class="svg-muted"')+text(40,62,number(baseline),'class="svg-stat"')+
+      `<rect x="40" y="82" width="${baseline*scale}" height="38" fill="#28364d"/>`+
+      text(40,166,'文件卡片＋复杂语义理解','class="svg-muted"')+text(40,203,number(hybrid),'class="svg-stat"')+
+      `<rect x="40" y="222" width="${cardTokens*scale}" height="38" fill="#a58bbd"/><rect x="${40+cardTokens*scale}" y="222" width="${semantic*scale}" height="38" fill="#6b8bdd"/>`+
+      text(40,298,'色带长度按输入token数量绘制','class="svg-muted"'),
+      '同一分词器与固定模板下的模型输入token对比',720,320);
+    for(const [id,value] of [['routing-card-count',cardTokens],['routing-semantic-count',semantic],['routing-total-count',baseline],
+      ['token-note-baseline',baseline],['token-note-hybrid',hybrid],['token-note-cards',cardTokens],['token-note-semantics',semantic]])$(id).textContent=number(value);
+    for(const id of ['routing-input-ratio','token-note-ratio'])$(id).textContent=(ratio*100).toFixed(2)+'%';
+    for(const id of ['routing-reduction','token-note-reduction'])$(id).textContent=(reduction*100).toFixed(2)+'%';
 
     // A real clock drives the pager. Reading, hidden tabs and reduced motion pause it.
     const viewport=$('gallery-viewport'), track=viewport.querySelector('.carousel-track');
@@ -195,5 +194,5 @@
     }
     select(initialIndex,false,false);viewport.dataset.ready='true';win.requestAnimationFrame(tick);
   }
-  return {eventGroups,eventView,autoplayStep,loopOrder,fieldPlanComparison,routingLayout,mount};
+  return {eventGroups,eventView,autoplayStep,loopOrder,tokenComparison,mount};
 });

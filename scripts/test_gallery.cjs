@@ -5,25 +5,24 @@ const {eventGroups, eventView, autoplayStep, loopOrder} = require('../showcase/g
 const data = JSON.parse(fs.readFileSync(require('node:path').join(__dirname, '../showcase/assets/gallery-data.json'), 'utf8'));
 const sum = (rows, key) => rows.reduce((n, r) => n + r[key], 0);
 
-test('field-plan comparison uses retained sources rather than deduplicated representatives',()=>{
- const {fieldPlanComparison,routingLayout}=require('../showcase/gallery.js');
- const p=fieldPlanComparison(data),f=require('../showcase/assets/final-results.json');
- assert.deepEqual(p,{total:14812812,semantic:392154,planned:14420658,reduction:14420658/14812812});
- assert.equal(p.total,f.preparation.retained_records);
- assert.equal(p.planned,f.preparation.field_mapped_records);
- assert.equal(p.semantic,f.preparation.pending_semantic_source_records);
- assert.equal((p.reduction*100).toFixed(2),'97.35');
- for(const semantic of [1,27,99]){
-  const b=routingLayout(100,semantic);
-  assert.equal(b.semanticHeight/b.plannedHeight,semantic/(100-semantic));
-  assert.ok(b.plannedTop>=60+b.semanticHeight);
-  assert.equal(b.plannedTop+b.plannedHeight,300);
- }
- for(const semantic of [-1,14812813,NaN])assert.throws(()=>fieldPlanComparison({...data,dedup:{source_records:semantic}}));
+test('token comparison reconciles both routing inputs against a uniform all-record baseline',()=>{
+ const {tokenComparison}=require('../showcase/gallery.js'),t=require('../showcase/assets/token-comparison.json');
+ const p=tokenComparison(t);
+ assert.equal(p.cards,6877720);assert.equal(p.hybrid,p.cards+p.semantic);
+ assert.equal(p.semantic,t.input_tokens.row_llm+t.input_tokens.review);
+ assert.equal(p.baseline,Object.values(t.input_tokens).reduce((a,b)=>a+b,0));
+ assert.equal(Object.values(t.records).reduce((a,b)=>a+b,0),14812812);
+ assert.equal(t.units.map+t.units.entity_only,1755);assert.equal(t.units.row_llm+t.units.review,857);
+ assert.equal(p.ratio,t.input_ratio);assert.equal(p.reduction,t.input_reduction);
+ assert.equal(t.quality_excluded,1048465);
+ assert.ok(!/"cells"|"file_id"|"scope_id"|"path"|\/opt\//.test(JSON.stringify(t)));
+ assert.throws(()=>tokenComparison({...t,hybrid_input_tokens:p.hybrid+1}));
+ assert.throws(()=>tokenComparison({...t,all_record_input_tokens:0}));
  const html=fs.readFileSync(require('node:path').join(__dirname,'../showcase/index.html'),'utf8');
  const card=html.split('data-card-key="dedup"')[1].split('data-card-key="network"')[0];
- assert.match(card,/异构表格理解与统一提取/);assert.match(card,/含义与业务语境/);
- assert.ok(!/内容去重与推理复用|什么样的数据，可以只理解一次|五步处理|0\.97%/.test(card));
+ assert.match(card,/1,347＋408/);assert.match(card,/382＋475/);
+ assert.ok(!/97\.35%|逐条语义处理范围减少/.test(card));
+ assert.ok(!html.includes('id="dedup-reuse-percent"'));
 });
 
 test('gallery aggregates reconcile separately within the completed full corpus', () => {
@@ -113,7 +112,7 @@ test('gallery mount targets exist and all nine slides have accessible navigation
   for(const match of js.matchAll(/\$\('([a-z0-9-]+)'\)/g)) assert.ok(ids.has(match[1]),match[1]);
   assert.equal([...html.matchAll(/data-notebook="\d+"/g)].length,9);
   assert.equal([...html.matchAll(/data-gallery-page="\d+"/g)].length,9);
-  assert.ok(html.includes('src="gallery.js"'));
+  assert.match(html,/src="gallery\.js(?:\?[^"\s]*)?"/);
   assert.ok(html.includes('aria-roledescription="轮播"'));
 });
 test('circular recentering keeps both neighbors at every wrap without cloning cards',()=>{
@@ -305,7 +304,7 @@ test('review calculator states explicit assumptions and the flow only decreases 
  const html=fs.readFileSync(require('node:path').join(__dirname,'../showcase/index.html'),'utf8');
  assert.ok(html.indexOf('id="review-mechanism"')>html.indexOf('id="pipeline"'));
  assert.ok(html.indexOf('id="review-mechanism"')<html.indexOf('id="field-notes"'));
- for(const key of ['尚未执行人工抽查','新随机样本复验','最多两轮','不是NIST规定','pmc232.htm','NIST.AI.600-1.pdf'])assert.ok(html.includes(key));
+ for(const key of ['抽查参数配置与检出概率计算','新随机样本复验','最多两轮','不是NIST规定','pmc232.htm','NIST.AI.600-1.pdf'])assert.ok(html.includes(key));
 });
 
 test('review-unit routing update is pending and never rewrites historical result counts',()=>{
@@ -316,8 +315,26 @@ test('review-unit routing update is pending and never rewrites historical result
  assert.equal(update.planned_semantic_units,update.affected_processing_units+update.historical_semantic_units);
  assert.equal(update.planned_semantic_units,857);
  const m=require('../showcase/run-visual.js'),html=m.render(3,snapshot);
- assert.match(html,/原待复核 → 复杂语义/);assert.match(html,/尚未执行/);
+ assert.match(html,/原待复核 → 复杂语义/);assert.match(html,/已实现/);
  assert.equal(snapshot.preparation.pending_semantic_source_records,392154);
  assert.equal(snapshot.final_counts.events,5968620);
  assert.ok(!/"cells"|"file_id"|"scope_id"|\/opt\//.test(JSON.stringify(update)));
+});
+
+
+test('award rules enforce a numeric amount and the exact three-state domain',()=>{
+ const {validateAward}=require('../showcase/review.js');
+ assert.deepEqual(validateAward({amount:'120',status:'已中标'}),{errors:[],action:'confirmed'});
+ assert.equal(validateAward({amount:'80.5',status:'拟中标'}).action,'proposed');
+ assert.deepEqual(validateAward({amount:'',status:'未中标'}),{errors:[],action:'no_event'});
+ for(const amount of ['待定','约120','120万元','1e3','Infinity','-1']){
+  const result=validateAward({amount,status:'已中标'});assert.equal(result.action,'complex_semantic');
+  assert.equal(result.errors[0].code,'AMOUNT_NOT_DECIMAL');assert.equal(result.errors[0].value,amount);
+ }
+ for(const status of ['中标候选','已中标？',' 已中标','已中标 ','']){
+  const result=validateAward({amount:'120',status});assert.equal(result.errors[0].code,'ENUM_NOT_ALLOWED');
+  assert.equal(result.action,'complex_semantic');assert.equal(result.errors[0].rule,'STATUS_ENUM_V1');
+ }
+ assert.equal(validateAward({amount:'',status:'拟中标'}).errors[0].code,'AMOUNT_REQUIRED');
+ assert.equal(validateAward({amount:'0',status:'已中标'}).errors.length,0);
 });

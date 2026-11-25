@@ -12,15 +12,15 @@
   <meta property="og:url" content="https://chaomacv.github.io/public-data-llm/">
   <meta property="og:image" content="https://chaomacv.github.io/public-data-llm/assets/project-preview.svg">
   <link rel="icon" href="assets/mark.svg" type="image/svg+xml">
-  <link rel="stylesheet" href="style.css?v=review-routing-20261125">
-  <script src="locale-en.js?v=review-intro-20261125" defer></script>
+  <link rel="stylesheet" href="style.css?v=token-review-20261125">
+  <script src="locale-en.js?v=token-review-20261125" defer></script>
   <script src="i18n.js" defer></script>
   <script src="model.js" defer></script>
   <script src="app.js" defer></script>
   <script src="lineage.js?v=review-20261124" defer></script>
-  <script src="run-visual.js?v=review-routing-20261125" defer></script>
-  <script src="run.js?v=review-routing-20261125" defer></script>
-  <script src="gallery.js" defer></script>
+  <script src="run-visual.js?v=token-review-20261125" defer></script>
+  <script src="run.js?v=token-review-20261125" defer></script>
+  <script src="gallery.js?v=token-routing-20261125" defer></script>
   <script src="source-overview.js" defer></script>
   <script src="vendor/d3.v7.min.js" defer></script>
   <script src="vendor/d3-binarytree.min.js" defer></script>
@@ -31,7 +31,7 @@
   <script src="enterprise-network.js" defer></script>
   <script src="story-portrait.js" defer></script>
   <script src="methods.js" defer></script>
-  <script src="review.js?v=review-20261124" defer></script>
+  <script src="review.js?v=token-review-20261125" defer></script>
 </head>
 <body>
   <a class="skip" href="#main">跳到主要内容</a>
@@ -107,15 +107,16 @@ partition.size([2 * Math.PI, root.height + 1])(root)
 <span class="notebook-category">字段理解</span><div class="notebook-page"><div class="notebook-heading"><span class="cell-number">[06]</span><div><h3>异构表格理解与统一提取</h3><p>面对海量多源异构表格，利用本地大模型理解字段含义与业务语境，再结合程序规则完成统一提取。</p></div></div>
 <p class="notebook-callout">利用表内稳定结构，理解表间语义差异。模型通过表头与样本制定处理方案，程序逐条执行，减少逐表编写和维护规则的工作。</p>
 <div id="gallery-dedup-chart" class="gallery-figure"></div>
-<div class="notebook-formula" aria-label="逐条语义处理范围减少比例等于一减去复杂语义来源数除以保留记录数"><span>r</span><span>=</span><span>1 −</span><span class="fraction"><span id="routing-semantic-count">392,154</span><span id="routing-total-count">14,812,812</span></span><span>=</span><strong id="routing-reduction">97.35%</strong></div>
-<p class="notebook-small">逐条语义处理范围减少97.35%。字段方案分流包含程序处理和按方案保留复核的记录；模型仍需读取文件卡片与样本，比例不代表调用次数、耗时或成本的降幅。</p>
+<dl class="token-input-counts"><div><dt>C · 文件卡片输入</dt><dd id="routing-card-count">—</dd></div><div><dt>S · 复杂语义输入</dt><dd id="routing-semantic-count">—</dd></div><div><dt>A · 全部逐条输入</dt><dd id="routing-total-count">—</dd></div></dl>
+<div class="notebook-formula token-comparison-formula" aria-label="混合方案输入token占全部逐条输入token的比例"><span>q</span><span>=</span><span class="fraction"><span>C + S</span><span>A</span></span><span>=</span><strong id="routing-input-ratio">—</strong></div>
+<p class="notebook-small"><span>输入token减少</span> <strong id="routing-reduction">—</strong><span>。C对应1,347＋408个单元的文件卡片；S对应382＋475个单元的完整记录。共同的文件筛选步骤不计入本次比较。</span></p>
 <pre class="gallery-code"><code># Conceptual example: understand the schema, execute a checked plan
 plan = local_llm(file_card)
 for row in complete_records:
     result = execute_checked_plan(plan, row)</code></pre>
 <section class="dedup-example routing-example" aria-labelledby="routing-example-title"><h4 id="routing-example-title">从不同字段，到统一表示</h4><p class="dedup-example-scope">字段示意 · 映射须结合文件主题、主体角色与样本确认</p><table class="gallery-table"><thead><tr><th>来源A</th><th>来源B</th><th>统一表示</th></tr></thead><tbody><tr><td>申请企业</td><td>单位名称</td><td>主体名称</td></tr><tr><td>许可决定日期</td><td>批准时间</td><td>事件日期</td></tr><tr><td>决定书编号</td><td>文号</td><td>证据编号</td></tr></tbody></table></section>
 <div class="notebook-callout">无法通过字段方案可靠处理的复杂语义内容，交给本地LLM逐条理解，保留来源与复核状态。</div>
-<footer class="notebook-scope">比较范围：筛选与质量清洗后保留的同一批记录 · 原始数据与来源继续保留</footer></div></article><article class="data-notebook" data-card-key="network" data-notebook="6" aria-roledescription="幻灯片" aria-label="7 / 9：企业画像相似网络"><span class="notebook-category">画像网络</span><div class="notebook-page"><div class="notebook-heading"><span class="cell-number">[07]</span><div><h3>企业画像相似网络</h3><p>100 个圆点对应 100 家真实企业；切换相似网络与标签网络，观察共同标签及事件数量的影响。</p></div></div>
+<footer class="notebook-scope">Qwen3-8B两路输入测算 · 筛选、复杂单元前置规划、输出与重试另计</footer></div></article><article class="data-notebook" data-card-key="network" data-notebook="6" aria-roledescription="幻灯片" aria-label="7 / 9：企业画像相似网络"><span class="notebook-category">画像网络</span><div class="notebook-page"><div class="notebook-heading"><span class="cell-number">[07]</span><div><h3>企业画像相似网络</h3><p>100 个圆点对应 100 家真实企业；切换相似网络与标签网络，观察共同标签及事件数量的影响。</p></div></div>
 <div class="network-simple-toolbar"><span id="network-total">正在读取真实企业样本…</span><label class="sr-only" for="network-mode">网络视图</label><select id="network-mode" aria-label="网络视图"><option value="similarity">企业相似网络</option><option value="bipartite">企业—标签网络</option></select><label class="sr-only" for="network-dimension">网络空间</label><select id="network-dimension" aria-label="网络空间"><option value="2">二维</option><option value="3">三维</option></select></div>
 <details id="network-options" class="network-options"><summary>更多选项</summary><div class="network-option-body">
 
@@ -216,7 +217,7 @@ else:
     <section class="section shell architecture" id="pipeline" aria-labelledby="pipeline-title">
       <div class="section-intro"><div><p class="eyebrow">NINE STAGES / ONE SOURCE MAP</p><h2 id="pipeline-title">每一步的数据量和去向</h2></div><p>先看每一步的数据量与去向，再选择步骤查看方法及中间文件。筛选、分流、复用、回填和最终对账各自保留计量口径。</p></div>
       <aside id="run-routing-update" class="run-routing-update" aria-label="复杂语义通道调整">
-        <div><span class="routing-pending">路由已更新 · 尚未执行</span><h3><span id="run-routing-count">475</span> 个原待复核单元，全部转入复杂语义通道</h3><p>原方案原因、校验错误和质量标记保留；下次运行将逐条加入本地LLM处理队列，并关联问题台账。</p><p class="routing-history">原有 <span id="run-routing-original">382</span> 个语义单元，加上本次调整，计划共 <span id="run-routing-planned">857</span> 个。下方数据为已完成历史批次，新路由尚未重新推理，结果数量未更新。</p></div>
+        <div><span class="routing-pending">已实现 · 复杂语义后备通道</span><h3><span id="run-routing-count">475</span> 个原待复核单元，全部转入复杂语义通道</h3><p>原方案原因、校验错误和质量标记保留；可读取记录进入本地LLM语义队列，通过问题编号关联来源与处理结果。</p><p class="routing-history">原有 <span id="run-routing-original">382</span> 个语义单元，加上本次配置，覆盖 <span id="run-routing-planned">857</span> 个单元。下方展示固定批次的结果汇总，记录数、事件数和画像数分别计量。</p></div>
         <a class="text-link" href="https://github.com/chaomacv/public-data-llm/blob/main/docs/review_semantic_routing.md" target="_blank" rel="noopener">查看调整与问题记录</a>
       </aside>
       <div class="run-notebook">
@@ -261,29 +262,29 @@ else:
         <button id="review-tab-3" role="tab" aria-controls="review-panel-3" aria-selected="false" tabindex="-1" data-review-tab="3"><span>04</span>证据追溯</button>
       </div>
       <article class="review-panel" id="review-panel-0" role="tabpanel" aria-labelledby="review-tab-0">
-       <div><p class="overline">01 / SCHEMA &amp; EVIDENCE</p><h3>每张表，先理解规则，再核对输出。</h3><span class="review-status">已有字段方案与来源核验 · 类型及单位校验为增强设计</span><p>本地LLM通过文件卡片选择主体、证据字段、条件词和阶段词，生成有限的声明式方案。程序执行条件并引用原值，模型不生成任意代码或正则。</p><div class="review-route"><span>文件卡片</span><i>→</i><span>模型设计字段与条件</span><i>→</i><span>程序执行及核验</span></div><p>能用规则表达的进入程序通道；需要逐条理解的进入复杂语义通道；结构或含义不足的保留复核。</p><p class="review-note">公司后缀和字数只适合作异常提示。机构、合伙企业、联合体及自然人应核对主体角色，不能靠“公司”两字决定收录或排除。</p></div>
-       <div class="review-exhibit"><h4>采购中标表：约束示例</h4><span class="review-caption">合成示意 · 原值引用已有实现，以下组合展示规则设计</span><div class="review-rule"><strong>主体归属</strong><p>中标单位引用本行“中标单位”列，不能误取“采购人”或“项目名称”；主体类型不明确则复核。</p></div><div class="review-rule"><strong>金额与单位</strong><p>中标金额“120万元”不能替换成预算“500万元”。保留原值和字段来源；数值解析、单位一致性及换算属于增强设计，缺失金额不补零。</p></div><div class="review-rule"><strong>阶段与否定</strong><p>“已中标”与“拟中标／候选”区分阶段；“未中标／废标”不生成已中标事实。条件词随具体表的字段与语境设计。</p></div><p class="review-note">公示日期与决定日期也要分别映射。格式正确和引用存在，仍需结合业务语义核对。</p></div>
+       <div><p class="overline">01 / SCHEMA &amp; EVIDENCE</p><h3>一张中标表，对应一份可执行规则。</h3><span class="review-status">已实现 · 字段映射与逐行校验演示</span><p>先让本地LLM结合文件卡片确定字段含义，再把字段对应、金额类型和状态取值写成这张表的规则。下面用一份合成文件，展示规则怎样约束每一行。</p><div class="review-file-card"><strong>合成采购中标结果.xlsx / 结果公告</strong><span>文件卡片：中标单位、中标金额（万元）、中标状态；单位由表头确定。</span><table class="review-source-table"><thead><tr><th>行</th><th>中标单位</th><th>金额（万元）</th><th>中标状态</th></tr></thead><tbody><tr><td>12</td><td>合成甲公司</td><td>120</td><td>已中标</td></tr><tr><td>13</td><td>合成乙公司</td><td>待定</td><td>拟中标</td></tr><tr><td>14</td><td>合成丙公司</td><td>80</td><td>中标候选</td></tr></tbody></table></div><div class="review-rule"><strong>① 字段对应</strong><p>企业名称 ← 中标单位；金额 ← 中标金额（万元）；事件阶段 ← 中标状态。引用本行原值，不把采购人或项目名称当成中标企业。</p></div><p class="review-note">规则按文件分别制定：本例只允许下列三种状态；其他文件的状态集合和金额单位，根据各自文件卡片确定。</p></div>
+       <div class="review-exhibit"><h4>逐行校验与报错记录</h4><span class="review-caption">合成文件演示 · 修改下方原值，可直接观察核验结果</span><div class="review-rule"><strong>② 金额与单位</strong><p>本表金额单位固定为万元，单元格须为有限、非负十进制数字。“待定”“约120”“120万元”均报错；不自动删除文字。已中标、拟中标的金额必填；未中标可空，空值不补零。</p></div><div class="review-rule"><strong>③ 状态枚举</strong><p>仅允许“已中标／拟中标／未中标”，逐字匹配。已中标 → 已确认事件；拟中标 → 拟议事件；未中标 → 不生成中标事件。“中标候选”等集合外值报错，不自动猜成拟中标。</p></div><div class="review-rule"><strong>④ 异常去向</strong><p>第13行金额“待定”触发 AMOUNT_NOT_DECIMAL；第14行状态“中标候选”触发 ENUM_NOT_ALLOWED。记录文件、工作表、行号、字段、原值和规则编号，转入复杂语义通道，保留复核结果。</p></div><div class="review-validator"><h4>试改第14行</h4><label for="review-award-amount">中标金额（万元）</label><input id="review-award-amount" type="text" value="80" autocomplete="off"><label for="review-award-status">中标状态</label><select id="review-award-status"><option value="confirmed">已中标</option><option value="proposed">拟中标</option><option value="not_awarded">未中标</option><option value="candidate" selected>中标候选</option></select><div aria-live="polite"><p id="review-award-outcome"></p><ul id="review-award-errors" class="review-error-log"></ul></div></div></div>
       </article>
       <article class="review-panel" id="review-panel-1" role="tabpanel" aria-labelledby="review-tab-1" hidden>
        <div><p class="overline">02 / RECORD ACCOUNTING</p><h3>每条记录，一份去向台账。</h3><span class="review-status">已实现 · 更正版覆盖对账</span><p>记录编号连接文件、处理单元与原始位置。排除、质量剔除、收录、无事件和待复核分别留痕；已处理编号用于检查重复写入和遗漏。</p><p>精确去重只减少重复理解，原始来源映射继续保留；拆批后核对编号集合，复核项也有明确去向。</p><p class="review-note">对账证明已知记录有去向；独立语义正确率另行评测。</p></div>
        <div class="review-exhibit"><h4>本批数量守恒</h4><div id="review-accounting" class="review-accounting"></div><div class="review-route"><span>记录编号</span><i>→</i><span>唯一处理状态</span><i>→</i><span>来源与版本</span></div><p class="review-note">待复核已包含在处理台账中；事件数、画像数与记录数分别计量。</p></div>
       </article>
       <article class="review-panel" id="review-panel-2" role="tabpanel" aria-labelledby="review-tab-2" hidden>
-       <div><p class="overline">03 / HUMAN ACCEPTANCE</p><h3>随机抽查，发现问题后有退出机制。</h3><span class="review-status is-design">建议方案 · 尚未执行人工抽查</span><p>按同一来源、字段方案和模型版本划分同质审核批次，单批建议不超过1万条。先选择代表性批次试行，再按风险与人工预算扩展。</p><ul class="review-list"><li>每批随机抽150条；不足150条则全检。核对主体、事件、阶段、金额日期与证据。数量是可配置建议。</li><li>另加抽30条高风险记录：否定、撤销、金额单位、多人多主体和罕见事件。风险样本单独报告，不混入随机样本估计。</li><li>排除文件也要抽查：建议另选20个单元检查卡片及原件，避免只检查已提取结果而漏掉误排除。</li><li>抽查标准事先确定，疑难样本由两人复核并裁决；保留标注、分歧和整改记录。</li></ul>
+       <div><p class="overline">03 / HUMAN ACCEPTANCE</p><h3>随机抽查，发现问题后有退出机制。</h3><span class="review-status">已实现 · 抽查参数配置与检出概率计算</span><p>抽查配置示例：按同一来源、字段方案和模型版本划分同质审核批次，单批上限1万条，配置随机样本、风险样本和排除文件检查。</p><ul class="review-list"><li>每批随机抽150条；不足150条则全检。核对主体、事件、阶段、金额日期与证据。抽样数量可配置。</li><li>另加抽30条高风险记录：否定、撤销、金额单位、多人多主体和罕见事件。风险样本单独报告，不混入随机样本估计。</li><li>排除文件也要抽查：另选20个单元检查卡片及原件，避免只检查已提取结果而漏掉误排除。</li><li>抽查标准事先确定，疑难样本由两人复核并裁决；保留标注、分歧和整改记录。</li></ul>
         <div class="review-recovery"><strong>出现关键语义错误时</strong><p>暂停该批 → 定位字段、规则或语境问题 → 修复并留下版本 → 错例回归 → 重跑受影响范围 → 用新随机样本复验。</p><p>建议最多两轮有针对性的修复；仍不通过则隔离该作用域，降级为保留原文和待复核，交人工裁决，不无限重复同一推理。</p></div>
        </div>
        <div class="review-exhibit"><h4>抽样能发现多少问题？</h4><span class="review-caption">方案计算器 · 假设值，不是实测准确率</span><label class="review-control">随机样本量 n <input id="review-sample-n" type="range" min="50" max="300" step="10" value="150"><output id="review-sample-n-value">150</output></label><label class="review-control">真实错误率假设 <select id="review-error-rate"><option value="0.01">1%</option><option value="0.02" selected>2%</option><option value="0.05">5%</option></select></label><div class="review-probability"><strong id="review-detection">95.2%</strong><span>至少发现1个错误的概率</span></div><div class="review-formula">P(detect ≥ 1) = 1 − (1 − p)<sup>n</sup></div><p class="review-note">均匀随机抽取、同质批次足够大时的二项近似。零错样本也不保证整批无错；风险加抽不代入本公式。任何关键语义错误都应暂停放行，复验使用新样本。</p><p class="review-reference">计算参考 <a href="https://www.itl.nist.gov/div898/handbook/pmc/section2/pmc232.htm" target="_blank" rel="noopener">NIST Acceptance Sampling</a>；150／30／20与两轮上限均为本项目建议参数。</p></div>
       </article>
       <article class="review-panel" id="review-panel-3" role="tabpanel" aria-labelledby="review-tab-3" hidden>
-       <div><p class="overline">04 / SOURCE PROVENANCE</p><h3>标签来自事实，事实连回证据。</h3><span class="review-status">私有结果可追溯 · 公开交互使用合成示例</span><p>通过企业画像与事件，回到来源记录、原字段及原始附件。查看证据时核对主体、阶段和上下文；投诉、拟议与历史事项保留原意。</p><p>原值、来源位置和文件哈希保留；处理方案、模型与提示词版本关联检查点，变更后重做受影响范围的验证。</p><a class="text-link" href="#evidence">查看证据演示</a><p class="review-note">可追溯性支持复核与纠错，语义正确性仍需人工标注评估。私有原文不发布到展示页。</p></div>
+       <div><p class="overline">04 / SOURCE PROVENANCE</p><h3>标签来自事实，事实连回证据。</h3><span class="review-status">私有结果可追溯 · 公开交互使用合成示例</span><p>通过企业画像与事件，回到来源记录、原字段及原始附件。查看证据时核对主体、阶段和上下文；投诉、拟议与历史事项保留原意。</p><p>原值、来源位置和文件哈希保留；处理方案、模型与提示词版本关联检查点，变更后重做受影响范围的验证。</p><a class="text-link" href="#evidence">查看证据演示</a><p class="review-note">沿来源链核对字段含义、主体归属与事件阶段；私有原文保留在私有环境。</p></div>
        <div class="review-exhibit"><h4>沿来源链，回到原件</h4><ol class="review-evidence-chain"><li>画像标签</li><li>事实事件与阶段</li><li>来源记录与字段引用</li><li>原始附件与来源页面</li></ol><code class="review-source-key">file_id / scope_id / record_id / field</code><p class="review-reference">监督与来源追溯参考 <a href="https://nvlpubs.nist.gov/nistpubs/ai/NIST.AI.600-1.pdf" target="_blank" rel="noopener">NIST AI 600-1</a>。上述人工验收参数是项目设计，不是NIST规定。</p></div>
       </article></div>
       <div class="review-version-strip"><strong>贯穿全程：版本与回归</strong><span>文件哈希 · 解析器版本 · 字段方案 · 模型及提示词 · 独立更正版导出</span></div>
     </section>
 
     <section class="section shell field-notes" id="field-notes" aria-labelledby="field-notes-title">
-      <div class="section-intro"><div><p class="eyebrow">FIELD NOTES / VERIFIED ENGINEERING CASES</p><h2 id="field-notes-title">工程处理设计</h2></div><p>以下数字来自实际处理中的工程核验。它们说明工具如何组合；语义准确率仍需独立标注评估。</p></div>
-      <article class="field-note"><div class="field-note-copy"><p class="overline">01 / EXACT CONTENT REUSE</p><h3>相同内容，理解一次；<br>每条来源，继续保留。</h3><p>同文件、同逻辑表，完整单元格与语境一致时，模型处理代表记录，再核对原文引用并回填各自的位置。“同上”等相对表述单独处理。</p><p class="field-note-caption">分组基于完整内容，不做空白归一化或跨表近似合并。</p></div><div class="field-note-visual"><div class="dedup-numbers"><div><strong id="dedup-source-count">392,154</strong><span>待语义处置的来源记录</span></div><i aria-hidden="true">→</i><div><strong id="dedup-representative-count">388,348</strong><span>不同内容代表</span></div></div><div class="dedup-meter" role="img" aria-label="约99.03%的不同内容代表与0.97%的重复来源记录"><span id="dedup-unique-bar" style="width:99.03%"></span><span id="dedup-reuse-bar" style="width:0.97%"></span></div><div class="dedup-meter-labels"><span><i class="dot sage"></i> 不同内容</span><span><i class="dot pale"></i> 可复用来源 <b id="dedup-reuse-percent">0.97%</b></span></div><p class="field-note-caption"><span id="dedup-reuse-count">3,806</span> 条重复来源仍保留独立记录 ID。重复次数不等于独立证据数量。</p></div></article>
+      <div class="section-intro"><div><p class="eyebrow">FIELD NOTES / VERIFIED ENGINEERING CASES</p><h2 id="field-notes-title">工程处理设计</h2></div><p>以下数字来自实际处理中的工程核验，展示工具组合、来源检查与数量核对的方法。</p></div>
+      <article class="field-note"><div class="field-note-copy"><p class="overline">01 / SCHEMA UNDERSTANDING &amp; TOKEN BUDGET</p><h3>字段按表理解，<br>复杂内容逐条处理。</h3><p>1,347个程序提取单元与408个主体信息单元，由模型读取文件卡片并制定方案；程序按方案处理完整记录。382个逐条语义单元与475个后备语义单元，按完整记录计算模型输入。</p><p class="field-note-caption">两侧均以同一套Qwen分词器计数。比较输入token，保留共同筛选步骤之外的文件方案与逐条提取口径。</p></div><div class="field-note-visual token-field-note"><div class="token-case"><span>A · 全部逐条输入</span><strong id="token-note-baseline">—</strong></div><div class="token-case"><span>C + S · 混合方案输入</span><strong id="token-note-hybrid">—</strong></div><div class="token-components"><span>C · 文件卡片</span><b id="token-note-cards">—</b><span>S · 复杂语义</span><b id="token-note-semantics">—</b></div><p class="field-note-caption"><span>混合方案输入占比</span> <strong id="token-note-ratio">—</strong><span>；减少</span> <strong id="token-note-reduction">—</strong><span>。按统一单条模板测算，不等于运行耗时或生成成本的降幅。</span></p></div></article>
       <article class="field-note"><div class="field-note-copy"><p class="overline">02 / RECONSTRUCTIBLE HTML VIEWS</p><h3>保留原始 HTML，<br>构造可核对的文字视图。</h3><p>标签与展示属性会占用上下文。视图保留文字、脚本数据与非展示属性，同时记录版本和原字段哈希；原始 HTML 完整留存。</p><p class="field-note-caption">12 条真实公告：正文字符数 118,616 → 28,338，原始单元格未改。布局含义仍需结合原件核对。</p></div><div class="field-note-visual html-view-figure"><div class="story-toggle" role="group" aria-label="合成HTML视图示意"><button type="button" data-html-view="raw" aria-pressed="true">原 HTML</button><button type="button" data-html-view="text" aria-pressed="false">文字视图</button><span>合成示意</span></div><pre><code id="html-story-example">&lt;p class="notice"&gt;合成&lt;span&gt;HTML&lt;/span&gt;有限公司已处罚，罚款100元。&lt;/p&gt;</code></pre><div class="html-view-evidence"><span>原字段哈希</span><code>SHA256(original_cell)</code><span>引用核对</span><code>field + exact substring</code></div><p class="field-note-caption">跨标签名称可在视图中连续引用；引用仍绑定本行原字段。</p></div></article>
       <article class="field-note"><div class="field-note-copy"><p class="overline">03 / BUDGET FIRST, THEN BATCH</p><h3>拆开长请求，<br>仍然用好批处理。</h3><p>长记录超预算后，逐条同步回退会让批处理失效。先拆出符合 tokenizer 预算的完整记录子组，再同时提交独立请求。</p><p class="field-note-caption">保留原来的分段深度、单请求内容与输出上限。已有检查点经逐条核验后继续复用。</p></div><div class="field-note-visual timing-figure"><p class="timing-meta">同一 RTX 4090 / Qwen3-8B BF16 / 8 条真实公告</p><div class="timing-row"><span>逐条回退</span><div><i class="timing-before"></i></div><strong id="batch-before-value">89.9 s</strong></div><div class="timing-row"><span>拆组后批量提交</span><div><i class="timing-after" id="batch-after-bar" style="width:47.98%"></i></div><strong id="batch-after-value">43.1 s</strong></div><p class="field-note-caption">两组先进行相同前缀预热，客户端生成缓存从空开始。实际请求键与最终来源校验结果一致，八条均为 REVIEW；这是单次工程对照。</p></div></article>
     </section>

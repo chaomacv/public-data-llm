@@ -1,0 +1,41 @@
+{
+  "schema_version": 1,
+  "kind": "token_routing_comparison",
+  "measured_on": "2026-11-25",
+  "model": "Qwen3-8B",
+  "method": "uniform_single_record_input_v1",
+  "tokenizer_sha256": "aeb13307a71acd8fe81861d94ad54ab689df773318809eed3cbe794b4492dae4",
+  "source_script_sha256": "e0e2ed3ffb249388098dfb4700c6f0f6671ebdeddcff3704301ba7c94986dcd3",
+  "retained_records": 14812812,
+  "card_input_tokens": 6877720,
+  "semantic_input_tokens": 3781513648,
+  "hybrid_input_tokens": 3788391368,
+  "all_record_input_tokens": 25217680296,
+  "input_ratio": 0.15022759125869758,
+  "input_reduction": 0.8497724087413024,
+  "scope": "post_screening_input_tokens_only_no_outputs_retries_or_batching",
+  "record_template": "system extract prompt; user file context and ontology; user complete record; Qwen chat wrapper",
+  "units": {
+    "map": 1347,
+    "entity_only": 408,
+    "review": 475,
+    "row_llm": 382
+  },
+  "records": {
+    "entity_only": 1946147,
+    "map": 11840748,
+    "review": 633763,
+    "row_llm": 392154
+  },
+  "input_tokens": {
+    "entity_only": 2837059818,
+    "map": 18599106830,
+    "review": 3110750482,
+    "row_llm": 670763166
+  },
+  "card_tokens": {
+    "map": 5453044,
+    "entity_only": 1424676
+  },
+  "quality_excluded": 1048465
+}
