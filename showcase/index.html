@@ -13,13 +13,13 @@
   <meta property="og:image" content="https://chaomacv.github.io/public-data-llm/assets/project-preview.svg">
   <link rel="icon" href="assets/mark.svg" type="image/svg+xml">
   <link rel="stylesheet" href="style.css?v=mobile-rule-row-20261125">
-  <script src="locale-en.js?v=token-review-20261125" defer></script>
+  <script src="locale-en.js?v=main-flow-20261125" defer></script>
   <script src="i18n.js" defer></script>
   <script src="model.js" defer></script>
   <script src="app.js" defer></script>
-  <script src="lineage.js?v=review-20261124" defer></script>
+  <script src="lineage.js?v=main-flow-20261125" defer></script>
   <script src="run-visual.js?v=token-review-20261125" defer></script>
-  <script src="run.js?v=token-review-20261125" defer></script>
+  <script src="run.js?v=main-flow-20261125" defer></script>
   <script src="gallery.js?v=token-routing-20261125" defer></script>
   <script src="source-overview.js" defer></script>
   <script src="vendor/d3.v7.min.js" defer></script>
@@ -31,7 +31,7 @@
   <script src="enterprise-network.js" defer></script>
   <script src="story-portrait.js" defer></script>
   <script src="methods.js" defer></script>
-  <script src="review.js?v=token-review-20261125" defer></script>
+  <script src="review.js?v=main-flow-20261125" defer></script>
 </head>
 <body>
   <a class="skip" href="#main">跳到主要内容</a>
@@ -138,12 +138,12 @@ link_distance = 220 - 160 * similarity</code></pre>
 <div class="portrait-business"><span class="portrait-provisional">PROVISIONAL · 暂定身份</span><div class="portrait-heading"><h4 id="portrait-name"></h4><span class="portrait-avatar" aria-hidden="true">企</span></div><p id="portrait-address"></p><div id="portrait-tags" class="portrait-tags"></div></div>
 <div id="portrait-timeline" class="portrait-timeline"></div>
 <p class="portrait-boundary">每条事实保留来源和阶段。未观察到某类事件，不代表该类事件不存在；拟认定也不等于已认定。</p>
-<footer class="notebook-scope">数量：全批已完成结果 · 画像包含临时身份 · 个体示例：仓库合成规则Demo，不是Qwen实测准确率</footer></div></article><article class="data-notebook" data-card-key="timeline" data-notebook="8" aria-roledescription="幻灯片" aria-label="9 / 9：处理进度与数据去向"><span class="notebook-category">数据去向</span><div class="notebook-page"><div class="notebook-heading"><span class="cell-number">[09]</span><div><h3>处理进度与数据去向</h3><p>沿语义处理分支逐步筛选；悬停圆点，查看每步数量与分流原因。时间模式保留真实推理观测。</p></div></div>
-<div class="lineage-toolbar"><div class="lineage-mode" role="group" aria-label="数据去向探索视图"><button type="button" data-lineage-mode="flow" aria-pressed="true">数据去向</button><button type="button" data-lineage-mode="time" aria-pressed="false">时间进度</button></div><label id="lineage-scale-label">纵轴 <select id="lineage-scale" aria-label="数据去向纵轴刻度"><option value="log">对数</option><option value="linear">线性</option></select></label></div>
-<div class="lineage-reading"><strong id="lineage-count">388,348</strong><span id="lineage-unit">内容代表 · 个内容代表</span><span id="lineage-at">处理阶段 4 / 4</span></div>
+<footer class="notebook-scope">数量：全批已完成结果 · 画像包含临时身份 · 个体示例：仓库合成规则Demo，不是Qwen实测准确率</footer></div></article><article class="data-notebook" data-card-key="timeline" data-notebook="8" aria-roledescription="幻灯片" aria-label="9 / 9：处理进度与数据去向"><span class="notebook-category">数据去向</span><div class="notebook-page"><div class="notebook-heading"><span class="cell-number">[09]</span><div><h3>处理进度与数据去向</h3><p>从4,365.4万条解析记录，到1,481.3万条保留记录，再到5,968,620条事件观察。悬停圆点查看处理方法与数量口径。</p></div></div>
+<div class="lineage-toolbar"><div class="lineage-mode" role="group" aria-label="数据去向探索视图"><button type="button" data-lineage-mode="flow" aria-pressed="true">数据去向</button><button type="button" data-lineage-mode="time" aria-pressed="false">时间进度</button></div><label id="lineage-scale-label">纵轴 <select id="lineage-scale" aria-label="数据去向纵轴刻度"><option value="log">对数</option><option value="linear" selected>线性</option></select></label></div>
+<div class="lineage-reading"><strong id="lineage-count">5,968,620</strong><span id="lineage-unit">事件观察 · 条事件观察</span><span id="lineage-at">处理阶段 3 / 3</span></div>
 <div id="gallery-timeline-chart" class="gallery-figure lineage-chart"></div>
 <p id="lineage-axis-note" class="lineage-axis-note"></p>
-<label class="space-control" for="lineage-scrub">选择节点 <input id="lineage-scrub" type="range" min="0" max="3" value="3"><output id="lineage-index" for="lineage-scrub">4 / 4</output></label>
+<label class="space-control" for="lineage-scrub">选择节点 <input id="lineage-scrub" type="range" min="0" max="2" value="2"><output id="lineage-index" for="lineage-scrub">3 / 3</output></label>
 <div id="lineage-info" class="lineage-info" role="status" aria-live="polite"></div>
 <div id="lineage-equations" class="lineage-equations"></div>
 <div class="notebook-callout">曲线止于语义通道的388,348个内容代表；14,420,658条字段方案记录另行处理。代表结果回填来源后，完整处理台账仍为14,812,812条。</div>

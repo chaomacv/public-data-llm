@@ -41,7 +41,7 @@
   $('review-award-amount').addEventListener('input',checkAward);$('review-award-status').addEventListener('change',checkAward);checkAward();
   function calculate(){const n=Number($('review-sample-n').value),p=Number($('review-error-rate').value);$('review-sample-n-value').textContent=String(n);const probability=detectionProbability(n,p);$('review-detection').textContent=probability<1&&probability>.999?'>99.9%':(100*probability).toFixed(1)+'%';}
   $('review-sample-n').addEventListener('input',calculate);$('review-error-rate').addEventListener('change',calculate);calculate();
-  const response=await win.fetch('assets/data-lineage.json?v=review-20261124');if(!response.ok)throw Error('Lineage unavailable');
+  const response=await win.fetch('assets/data-lineage.json?v=main-flow-20261125');if(!response.ok)throw Error('Lineage unavailable');
   const data=win.BEILineage.validate(await response.json()),c=data.counts,fmt=n=>n.toLocaleString('en-US');
   const rows=[['已知记录',c.known,[c.excluded,c.quality,c.retained]],['处理分流',c.retained,[c.mapped,c.semantic]],['语义来源',c.semantic,[c.representatives,c.reused]]];
   $('review-accounting').innerHTML=rows.map(([label,total,parts])=>'<div><span>'+label+'</span><strong>'+fmt(total)+'</strong><small>= '+parts.map(fmt).join(' + ')+'</small></div>').join('');

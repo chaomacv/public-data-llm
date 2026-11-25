@@ -15,7 +15,7 @@ def build(assets):
     assert correction['subject_and_event_sources_affected'] == 0 and correction['coverage_reconciled']
     if not run['validation']['final_audit_passed'] or not gallery['final_pipeline_complete']:
         raise ValueError('Completed batch required')
-    c = {'known': final['input']['known_logical_records'],
+    c = {'events': final['counts']['events'], 'known': final['input']['known_logical_records'],
          'excluded': final['preparation']['excluded_records'],
          'retained': final['preparation']['retained_records'],
          'quality': final['preparation']['quality_excluded_records'],
@@ -91,10 +91,9 @@ def build(assets):
          'files': ['correction.json', '05_quality/placeholder_records.parquet', '08_results/record_ledger.parquet', '09_review/record_review.parquet']},
     ]
     points = [
-        ('parsed', '解析总量', 'known', '条已知逻辑记录', 1, [stages[1]['output'], '独立处理单元指工作表、文档表格或正文集合；均保留原附件关系。']),
-        ('retained', '保留', 'retained', '条保留记录', 4, [f"相关性排除 {n('excluded')} 条，质量剔除 {n('quality')} 条，保留 {n('retained')} 条。", stages[4]['flow'][0]]),
-        ('semantic', '语义来源', 'semantic', '条复杂来源记录', 4, [f"{n('mapped')} 条走字段方案；{n('semantic')} 条进入逐条语义通道。", stages[4]['flow'][1]]),
-        ('representatives', '内容代表', 'representatives', '个内容代表', 5, [f"精确分组：{n('representatives')} 个代表 + {n('reused')} 条重复来源。", stages[5]['flow'][1]]),
+        ('parsed', '解析总量', 'known', '条解析记录', 1, [stages[1]['output'], '统计解析器识别的完整记录。']),
+        ('retained', '保留记录', 'retained', '条保留记录', 4, [stages[4]['output'], '经过相关性筛选与占位行质量清洗。']),
+        ('events', '事件观察', 'events', '条事件观察', 7, ['两条处理通道的结果汇合，经主体关联与事件归并形成5,968,620条事件观察。', '此节点按事件计量；一条记录可不产生事件，也可包含多个事件。'])
     ]
     result = {'schema_version': 1, 'kind': 'completed_batch_lineage',
               'source_commit': final['source_commit'], 'completed_at': final['completed_at'],
@@ -103,7 +102,7 @@ def build(assets):
                                 for name in ['final-results.json', 'run-summary.json', 'gallery-data.json', 'quality-correction.json']},
               'counts': c, 'outcomes': outcomes, 'equations': equations,
               'flow_axis': 'processing_stage_order_not_elapsed_time',
-              'flow_scope': 'retained_to_semantic_representatives_not_all_final_results',
+              'flow_scope': 'parsed_records_to_retained_records_to_event_observations',
               'flow_points': [{'id': ident, 'name': name, 'count': c[key], 'count_key': key,
                                'unit': unit, 'step': step, 'details': details}
                               for ident, name, key, unit, step, details in points],
@@ -111,7 +110,7 @@ def build(assets):
               'quality_correction': final['quality_correction'],
               'timing_note': '时间曲线为质量更正前的历史执行观测，分母388,349；更正后业务口径代表388,348，不改写历史观测。阶段图按处理顺序排列，不虚构阶段完成时刻。时间图只使用真实观测；末点为最终验收时已全部完成，并非精确推理结束时刻。'}
     (assets / 'data-lineage.json').write_text(json.dumps(result, ensure_ascii=False, indent=2) + '\n', encoding='utf-8')
-    print('Exported four monotone lineage points, nine stages and actual progress observations.')
+    print('Exported three main-flow lineage points, nine stages and actual progress observations.')
 
 
 if __name__ == '__main__':
