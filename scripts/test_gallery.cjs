@@ -307,3 +307,17 @@ test('review calculator states explicit assumptions and the flow only decreases 
  assert.ok(html.indexOf('id="review-mechanism"')<html.indexOf('id="field-notes"'));
  for(const key of ['尚未执行人工抽查','新随机样本复验','最多两轮','不是NIST规定','pmc232.htm','NIST.AI.600-1.pdf'])assert.ok(html.includes(key));
 });
+
+test('review-unit routing update is pending and never rewrites historical result counts',()=>{
+ const update=require('../showcase/assets/routing-update.json'),snapshot=require('../showcase/assets/run-summary.json');
+ assert.equal(update.status,'not_executed');assert.equal(update.historical_results_unchanged,true);
+ assert.equal(update.affected_processing_units,snapshot.plans.review);
+ assert.equal(update.historical_semantic_units,snapshot.plans.row_llm);
+ assert.equal(update.planned_semantic_units,update.affected_processing_units+update.historical_semantic_units);
+ assert.equal(update.planned_semantic_units,857);
+ const m=require('../showcase/run-visual.js'),html=m.render(3,snapshot);
+ assert.match(html,/原待复核 → 复杂语义/);assert.match(html,/尚未执行/);
+ assert.equal(snapshot.preparation.pending_semantic_source_records,392154);
+ assert.equal(snapshot.final_counts.events,5968620);
+ assert.ok(!/"cells"|"file_id"|"scope_id"|\/opt\//.test(JSON.stringify(update)));
+});

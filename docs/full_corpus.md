@@ -74,7 +74,7 @@ CUDA_VISIBLE_DEVICES=0 python -m bank_data.serve_vllm \
 
 - 文件：PROFILED 已解析；EMPTY 无记录；CONTAINER 压缩容器；CONVERTED 有独立转换结果；COMPONENT 由数据库逻辑表消费的组件；METADATA 配套元数据；REVIEW 无法可靠读取。
 - 筛选：KEEP 保留；DROP 明确排除；REVIEW 继续尝试字段规划，仍不确定则保留复核。
-- 字段方案：map 直接应用；entity_only 基础主体信息；row_llm 逐行理解；exclude 排除；review 无可靠方案。缺失方案不能当作排除。
+- 字段方案：map 直接应用；entity_only 基础主体信息；row_llm 逐行理解；exclude 排除；review 无可靠方案。2026-11-25起，review方案的可读取记录也进入复杂语义队列，保留原原因和质量问题；缺失方案同样登记问题后进入该后备通道，不能当作排除。新路由尚未在真实语料执行，旧批次数量保持原样。[问题记录与执行边界](review_semantic_routing.md)。
 - 记录：EXTRACTED 有可追溯事件；NO_EVENT 无该类事件，可以保留基础主体；REVIEW 不进入已确认事实库。
 - 事件阶段：confirmed / proposed / removed / revoked / unknown 分开保存。“未提取事件”不等于“企业无风险”。
 
