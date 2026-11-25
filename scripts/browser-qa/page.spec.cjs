@@ -46,6 +46,9 @@ test('review rounds expand the file card without replacing samples in either lan
   await page.locator('#lab').scrollIntoViewIfNeeded();
   await expect(page.locator('#sample-selected')).toHaveText('15');
   const samples=()=>page.locator('#sample-grid .sample-cell').evaluateAll(cells=>cells.flatMap((c,i)=>c.classList.length>1?[[i,c.className]]:[]));
+  const localizedText=()=>page.locator('#panel-sample').evaluate(el=>{
+    const copy=el.cloneNode(true);copy.querySelectorAll('[data-i18n-original]').forEach(n=>n.remove());return copy.textContent;
+  });
   const baseline=await samples();
   await page.locator('#sample-review-stage').selectOption('1');
   await expect(page.locator('#sample-selected')).toHaveText('27');
@@ -61,9 +64,11 @@ test('review rounds expand the file card without replacing samples in either lan
   await expect(page.locator('#sample-grid .external')).toHaveCount(12);
   await expect(page.locator('#sample-grid .human')).toHaveCount(24);
   await page.locator('#panel-sample').screenshot({path:info.outputPath('review-card-supplement.png')});
+  await page.locator('#business-extensions').screenshot({path:info.outputPath('business-extensions.png')});
   await page.locator('[data-language="en"]').click();
+  await page.locator('#business-extensions').screenshot({path:info.outputPath('business-extensions-english.png')});
   await expect(page.locator('#sample-review-stage')).toContainText('Human review');
-  expect(await page.locator('#panel-sample').innerText()).not.toMatch(/[\u3400-\u9fff]/);
+  expect(await localizedText()).not.toMatch(/[\u3400-\u9fff]/);
   await page.locator('#sample-review-stage').selectOption('0');
   await expect(page.locator('#sample-selected')).toHaveText('15');
   await page.locator('[data-review-tab="2"]').click();
@@ -73,7 +78,7 @@ test('review rounds expand the file card without replacing samples in either lan
   await page.locator('[data-review-tab="3"]').click();
   await page.locator('[data-sample-review="2"]').click();
   await expect(page.locator('#sample-selected')).toHaveText('51');
-  expect(await page.locator('#panel-sample').innerText()).not.toMatch(/[\u3400-\u9fff]/);
+  expect(await localizedText()).not.toMatch(/[\u3400-\u9fff]/);
   await page.locator('[data-language="zh"]').click();
   await expect(page.locator('#sample-review-stage')).toContainText('人工审查');
 });
